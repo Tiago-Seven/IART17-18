@@ -1,0 +1,9 @@
+Quantos -> "Quantos" [hoteis]? Possuir [o serviço de]? Serviço|
+          "Quantos" são os [hoteis]? InicioCondição|
+          "Quantos" [hoteis]? Existem InicioCondição
+InicioCondição -> com serviço | que têm serviço | que possuem serviço | em Localidade
+Serviço -> [insert serviço] e InicioCondição | [insert serviço] ? | [insert serviço] e Quantos
+Localidade -> [insert localidade] e InicioCondição
+//verificar depois no codigo se não se tem duas localidades
+Possuir -> têm | possuem | dispoem de | oferecem |
+Existem -> existem | há 
