@@ -1,3 +1,5 @@
+% base de dados
+
 %hotel(Nome,Local,Rating,Custo,Estrela,Servicos)
 hotel("Hotel Borges Chiado","Lisboa",6.8,90,3,["wifi"]).
 hotel("Turim Terreiro Do Paco","Lisboa",8.7,91,1,[]).
@@ -15,23 +17,28 @@ hotel("Marques de Pombal","Lisboa",4.5,119,4,["wifi"]).
 hotel("Eurostars Porto Douro","Porto",8.7,77,4,["baby-sitting","restaurante","estacionamento"]).
 hotel("Eurostars Oasis Plaza","Figueira da Foz",8.8,49,4,["wifi","piscina","pisos para fumadores","restaurante","baby-sitting","estacionamento","vista de mar"]).
 
-frase --> frase_declarativa(_X,_Y).
+%frase --> frase_declarativa(_X,_Y).
+frase --> frase_interrogativa(_X,_Y).
+frase_interrogativa(X,Y) --> pronome(X,Y), sintagma_verbal_interrogativo(X,Y), sintagma_nominal_interrogativo(_,_).
 frase_declarativa(X,Y) --> sintagma_nominal(X,Y), sintagma_verbal(X,Y).
 frase_declarativa(X,Y) --> sintagma_nominal(X,Y), sintagma_verbal(X,Y), conjuncao(X,Y), sintagma_verbal(X,Y).
-sintagma_nominal(X,Y) --> (quantificador(X,Y),nome(X,Y));(quantificador(_,m), nome_hotel).
-sintagma_nominal(X,Y) --> preposicao(X,Y), nome(X,Y).
-sintagma_nominal(X,Y) --> nome(X,Y).
+sintagma_nominal(X,Y) --> (quantificador(X,Y),numero(X,Y),nome(X,Y));(quantificador(X,Y),nome(X,Y));(quantificador(_,m), nome_hotel).
+sintagma_nominal(X,Y) --> (preposicao(X,Y), nome(X,Y)) ; (preposicao(X,Y), nome(X,Y), comparacao(X,Y)).
+sintagma_nominal(X,Y) --> nome(X,Y);(nome(X,Y),comparacao(X,Y)).
+sintagma_nominal_interrogativo(X,Y) --> (preposicao(X,Y), nome(X,Y), comparacao(_,_));(preposicao(X,Y), nome(X,Y)).
+comparacao(X,Y) --> comparador(X,Y),sintagma_nominal(X,Y).
 nome_hotel --> nome(_,_).
 nome_hotel --> nome(_,_), ((preposicao(X,Y), nome(X,Y), nome_hotel); nome_hotel).
-um_ou_mais_nomes(X,Y) --> nome(X,Y).
-um_ou_mais_nomes(X,Y) --> nome(X,Y), um_ou_mais_nomes(X,Y).
 sintagma_verbal(X,Y) --> verbo(X,Y).
 sintagma_verbal(X,Y) --> verbo(X,Y), sintagma_nominal(_,_).
 sintagma_verbal(X,Y) --> verbo(X,Y), nome(_,_), uma_ou_mais_conjucoes(_,_).
+sintagma_verbal_interrogativo(X,Y) --> verbo(X,Y), sintagma_nominal(X,Y).
 uma_ou_mais_conjucoes(X,Y) --> conjuncao(X,Y), nome(X,Y).
 uma_ou_mais_conjucoes(X,Y) --> conjuncao(X,Y), nome(X,Y), uma_ou_mais_conjucoes(_,_).
 uma_ou_mais_conjucoes(X,Y) --> conjuncao(X,Y), sintagma_verbal(X,Y).
 uma_ou_mais_conjucoes(X,Y) --> conjuncao(X,Y), sintagma_verbal(X,Y), uma_ou_mais_conjucoes(X,Y).
+
+verifica_sintaxe(X) :- split_string(X," "," ",L), frase(L,[]).
 
 /*Quantos (sao) os hoteis do Porto?
 Quais (sao) os hoteis de categoria superior a 3 estrelas em Lisboa?
@@ -121,30 +128,38 @@ nome(s,m)-->["Pombal"].
 nome(_,_)-->["Eurostars"].
 nome(s,m)-->["Douro"].
 nome(_,_)-->["Oasis"].
-
 nome(s,f) --> ["manel"].
 
-adjetivo(s,_) --> ["superior"].
-adjetivo(p,_) --> ["superiores"].
-adjetivo(s,_) --> ["inferior"].
-adjetivo(p,_) --> ["inferiores"].
-adjetivo(s,_) --> ["igual"].
-adjetivo(p,_) --> ["iguais"].
+digito(_,_) --> ["1"].
+digito(_,_) --> ["2"].
+digito(_,_) --> ["3"].
+digito(_,_) --> ["4"].
+digito(_,_) --> ["5"].
+digito(_,_) --> ["6"].
+digito(_,_) --> ["7"].
+digito(_,_) --> ["8"].
+digito(_,_) --> ["9"].
+digito(_,_) --> ["0"].
+numero_extenso(s,m) --> ["um"].
+numero_extenso(s,f) --> ["uma"].
+numero_extenso(p,m) --> ["dois"].
+numero_extenso(p,f) --> ["duas"].
+numero_extenso(p,_) --> ["tres"].
+numero_extenso(p,_) --> ["quatro"].
+numero_extenso(p,_) --> ["cinco"].
+numero(X,Y) --> numero_extenso(X,Y) ; digito(_,_).
+
+comparador(s,_) --> ["superior"].
+comparador(p,_) --> ["superiores"].
+comparador(s,_) --> ["inferior"].
+comparador(p,_) --> ["inferiores"].
+comparador(s,_) --> ["igual"].
+comparador(p,_) --> ["iguais"].
+
 adjetivo(s,_) --> ["parisiense"].
 adjetivo(p,_) --> ["parisienses"].
 adjetivo(s,_) --> ["portugues"].
 adjetivo(p,_) --> ["portugueses"].
-
-numero(_,_) --> ["1"].
-numero(_,_) --> ["2"].
-numero(_,_) --> ["3"].
-numero(_,_) --> ["4"].
-numero(_,_) --> ["5"].
-numero(_,_) --> ["6"].
-numero(_,_) --> ["7"].
-numero(_,_) --> ["8"].
-numero(_,_) --> ["9"].
-numero(_,_) --> ["0"].
 
 pronome(p,m) --> ["quantos"].
 pronome(s,m) --> ["quanto"].
@@ -173,11 +188,6 @@ quantificador(s,m) --> ["um"].
 quantificador(p,m) --> ["uns"].
 quantificador(s,f) --> ["uma"].
 quantificador(p,f) --> ["umas"].
-quantificador(p,m) --> ["dois"].
-quantificador(p,f) --> ["duas"].
-quantificador(p,_) --> ["tres"].
-quantificador(p,_) --> ["quatro"].
-quantificador(p,_) --> ["cinco"].
 preposicao(s,m) --> ["Do"].
 preposicao(s,m) --> ["do"].
 preposicao(p,m) --> ["dos"].
@@ -195,6 +205,7 @@ preposicao(_,_) --> ["para"].
 conjuncao(_,_) --> ["e"].
 pontuacao --> ["?"].
 
+% testes semanticos
 possuir(X,"rating") :- hotel(X,_,_,_,_,_).
 possuir(X,"servicos") :- hotel(X,_,_,_,_,_).
 possuir(X,"categoria") :- hotel(X,_,_,_,_,_).
@@ -205,6 +216,7 @@ com(X,"rating") :- hotel(X,_,_,_,_,_).
 com(X, "estrelas") :- hotel(X,_,_,_,_,_).
 com(X, "categoria") :- hotel(X,_,_,_,_,_).
 com(X, "servicos") :- hotel(X,_,_,_,_,_).
+com(X, "custo") :- hotel(X,_,_,_,_,_).
 local("Porto").
 local("Lisboa").
 local("Coimbra").
@@ -224,12 +236,17 @@ ser("vista de mar","servico").
 ser("wifi","servico").
 ser("piscina","servico").
 ser("baby-sitting","servico").
-ser("restaurante","servico").
 ser("piso para fumadores","servico").
 ser("pisos para fumadores","servico").
 ser("estacionamento","servico").
 ser(X, "hotel") :- hotel(X,_,_,_,_,_).
 ser(X,"numero") :- integer(X).
+caracteristica("superior").
+caracteristica("inferior").
+caracteristica("igual").
+adjetivo("estrelas", Y) :- caracteristica(Y).
+adjetivo("rating", Y) :- caracteristica(Y).
+adjetivo("custo", Y) :- caracteristica(Y).
 ter(X,"rating") :- hotel(X,_,_,_,_,_).
 ter(X,"servico") :- hotel(X,_,_,_,_,_).
 ter(X, Y) :- hotel(X,_,_,_,_,_), ser(Y,"servico").
