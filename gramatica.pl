@@ -1,6 +1,6 @@
 % base de dados
 
-%hotel(Nome,Local,Rating,Custo,Estrela,Servicos)
+%hotel(Nome,Local,Rating,Estrela,Servicos)
 hotel("Hotel Borges Chiado","Lisboa",6.8,3,["wifi"]).
 hotel("Turim Terreiro Do Paco","Lisboa",8.7,1,[]).
 hotel("TRYP Colina do Castelo","Castelo Branco",8.4,4,["restaurante"]).
@@ -214,8 +214,6 @@ verbo(s,_) --> ["fica"].
 verbo(p,_) --> ["ficam"].
 verbo(s,_) --> ["tem"].
 verbo(p,_) --> ["tem"].
-verbo(s,_) --> ["custa"].
-verbo(p,_) --> ["custam"].
 quantificador(s,m) --> ["o"].
 quantificador(p,m) --> ["os"].
 quantificador(p,f) --> ["as"].
@@ -252,7 +250,6 @@ com(X,"rating") :- hotel(X,_,_,_,_).
 com(X, "estrelas") :- hotel(X,_,_,_,_).
 com(X, "categoria") :- hotel(X,_,_,_,_).
 com(X, "servicos") :- hotel(X,_,_,_,_).
-com(X, "custo") :- hotel(X,_,_,_,_).
 local("Porto").
 local("Lisboa").
 local("Coimbra").
@@ -277,12 +274,11 @@ ser("pisos para fumadores","servico").
 ser("estacionamento","servico").
 ser(X, "hotel") :- hotel(X,_,_,_,_).
 ser(X,"numero") :- integer(X).
-caracteristica("superior").
-caracteristica("inferior").
-caracteristica("igual").
-adjetivo("estrelas", Y) :- caracteristica(Y).
-adjetivo("rating", Y) :- caracteristica(Y).
-adjetivo("custo", Y) :- caracteristica(Y).
+comparador("superior").
+comparador("inferior").
+comparador("igual").
+comparavel("estrelas", Y) :- caracteristica(Y).
+comparavel("rating", Y) :- caracteristica(Y).
 ter(X,"rating") :- hotel(X,_,_,_,_).
 ter(X,"servico") :- hotel(X,_,_,_,_).
 ter(X, Y) :- hotel(X,_,_,_,_), ser(Y,"servico").
