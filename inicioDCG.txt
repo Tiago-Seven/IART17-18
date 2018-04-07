@@ -7,3 +7,13 @@ Localidade -> [insert localidade] e InicioCondição
 //verificar depois no codigo se não se tem duas localidades
 Possuir -> têm | possuem | dispoem de | oferecem |
 Existem -> existem | há 
+
+
+custo(Hotel,Custo,igual) :- hotel(Hotel), hotel(X,_,_,Custo,_,_).
+custo(Hotel,Custo,maior) :- hotel(Hotel), hotel(Hotel,_,_,_,CustoDB,_),CustoDB > Custo.
+custo(Hotel,Custo,menor) :- hotel(Hotel), hotel(Hotel,_,_,_,CustoDB,_),CustoDB < Custo.
+
+rating(Hotel,Rating,igual) :- hotel(Hotel), hotel(X,_,Rating,_,_,_).
+rating(Hotel,Rating,maior) :- hotel(Hotel), hotel(X,_,Z,_,_,_),Z > Y.
+servico(Hotel,Servico) :- ser(Hotel,hotel), hotel(Hotel,_,_,_,_,Servicos), member(Servico,Servicos).
+local(Hotel,Local) :- ser(Hotel,hotel), hotel(Hotel,Local,_,_,_,_).
