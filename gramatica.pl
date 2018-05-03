@@ -39,10 +39,10 @@ sintagma_nominal(X,Y) --> nome(X,Y);(nome(X,Y),comparacao(X,Y));(numero(X,Y),nom
 sintagma_nominal(X,Y) --> nome_com_preposicao(X,Y).
 nome_com_preposicao(X,Y) --> nome(X,Y), preposicao(Z,P), nome(Z,P).
 nome_com_preposicao(X,Y) --> nome(X,Y), preposicao(Z,P), nome_com_preposicao(Z,P).
-sintagma_nominal_preposicional(X,Y) --> (preposicao(X,Y), nome(X,Y)) ; (preposicao(X,Y),numero(Z,P),nome(Z,P)) ; (preposicao(X,Y), nome(X,Y), comparacao(_,_))
+sintagma_nominal_preposicional(X,Y) --> (preposicao(X,Y), nome(X,Y)) ; (preposicao(X,Y),numero(Z,P),nome(Z,P)) ; (preposicao(Z,P), nome(Z,P), comparacao(Z,P))
   ; (preposicao(s,m), ["hotel"], adjetivo(s,m), nome_composto(_,_)) ; (preposicao(s,m), ["hotel"], nome_composto(_,_)); (preposicao(X,Y), nome_composto(X,Y)).
 sintagma_nominal_interrogativo(X,Y) --> sintagma_nominal_preposicional(X,Y).
-sintagma_nominal_interrogativo(X,Y) --> sintagma_nominal_preposicional(X,Y), sintagma_nominal_interrogativo(X,Y).
+sintagma_nominal_interrogativo(X,Y) --> sintagma_nominal_preposicional(X,Y), sintagma_nominal_interrogativo(_,_).
 comparacao(X,Y) --> comparador(X,Y),sintagma_nominal(X,Y).
 nome_composto(X,Y) --> nome(X,Y).
 nome_composto(X,Y) --> nome(X,Y), ((preposicao(X,Y), nome_composto(X,Y)); nome_composto(_,_)).
@@ -89,8 +89,7 @@ nome(s,m) --> ["Porto"].
 nome(s,f) --> ["Lisboa"].
 nome(s,f) --> ["Coimbra"].
 nome(s,m) --> ["Faro"].
-nome(s,m) --> ["Castelo"].
-nome(s,m) --> ["Branco"].
+nome(s,m) --> ["Castelo","Branco"].
 nome(s,f) --> ["Ponta"].
 nome(s,f) --> ["Delgada"].
 nome(s,f) --> ["Sesimbra"].
