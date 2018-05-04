@@ -53,33 +53,36 @@ uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_nominal(X-Y), uma_ou_mai
 uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_verbal(X-Y).
 uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_verbal(X-Y), uma_ou_mais_conjucoes(X-Y).
 
-verifica_sintaxe(X) :- split_string(X," , ",L), frase(L,[]).
+verifica_sintaxe(X) :-frase(X,[]).
 
-testes_interrogativas :-
-verifica_sintaxe("quais sao os hoteis de categoria superior a 3 estrelas em lisboa"),
-\+verifica_sintaxe("quais sao as hoteis de categoria superior a 3 estrelas em lisboa"),
-verifica_sintaxe("e em coimbra"),
-verifica_sintaxe("que servicos disponibiliza o hotel eurostars porto douro"),
-\+verifica_sintaxe("que servicos disponibilizam o hotel eurostars porto douro"),
-verifica_sintaxe("quais servicos disponibiliza o hotel eurostars porto douro"),
-verifica_sintaxe("quais os hoteis parisienses que possuem servico de babysitting"),
-verifica_sintaxe("quais os hoteis que possuem servico de babysitting"),
-\+verifica_sintaxe("quais os parisienses que possuem servico de babysitting"),
-verifica_sintaxe("quais os hoteis de faro que possuem categoria inferior a 4 e quartos com vista de mar"),
-verifica_sintaxe("quantos hoteis tem wifi e babysitting e piscina"),
-\+verifica_sintaxe("quanta hoteis tem wifi e babysitting e piscina"),
-verifica_sintaxe("e com wifi"),
-verifica_sintaxe("quais os hoteis com rating inferior a 8"),
-\+verifica_sintaxe("qual os hoteis com rating inferior a 8"),
-verifica_sintaxe("quantos sao os hoteis do porto").
+stringToAtom([],Aux,Aux).
+stringToAtom([X|Resto],Aux,Fim):-name(Atom, X),stringToAtom(Resto,[Atom|Aux],Fim).
+
+testes_interrogativas:-
+verifica_sintaxe([quais,sao,os,hoteis,de,categoria,superior,a,3,estrelas,em,lisboa]),
+\+verifica_sintaxe([quais,sao,as,hoteis,de,categoria,superior,a,3,estrelas,em,lisboa]),
+verifica_sintaxe([e,em,coimbra]),
+verifica_sintaxe([que,servicos,disponibiliza,o,hotel,eurostars,porto,douro]),
+\+verifica_sintaxe([que,servicos,disponibilizam,o,hotel,eurostars,porto,douro]),
+verifica_sintaxe([quais,servicos,disponibiliza,o,hotel,eurostars,porto,douro]),
+verifica_sintaxe([quais,os,hoteis,parisienses,que,possuem,servico,de,babysitting]),
+verifica_sintaxe([quais,os,hoteis,que,possuem,servico,de,babysitting]),
+\+verifica_sintaxe([quais,os,parisienses,que,possuem,servico,de,babysitting]),
+verifica_sintaxe([quais,os,hoteis,de,faro,que,possuem,categoria,inferior,a,4,e,quartos,com,vista,de,mar]),
+verifica_sintaxe([quantos,hoteis,tem,wifi,e,babysitting,e,piscina]),
+\+verifica_sintaxe([quanta,hoteis,tem,wifi,e,babysitting,e,piscina]),
+verifica_sintaxe([e,com,wifi]),
+verifica_sintaxe([quais,os,hoteis,com,rating,inferior,a,8]),
+\+verifica_sintaxe([qual,os,hoteis,com,rating,inferior,a,8]),
+verifica_sintaxe([quantos,sao,os,hoteis,do,porto]).
 
 testes_declarativas :-
-verifica_sintaxe("o hotel eurostars porto douro fica em faro e possui 4 estrelas"),
-\+verifica_sintaxe("a hotel eurostars porto douro fica em faro e possui 4 estrelas"),
-\+verifica_sintaxe("o hotel eurostars porto douro fica em faro e possui 1 estrelas"),
-verifica_sintaxe("o hotel the lince azores great hotel e em ponta delgada"),
-verifica_sintaxe("o yellow praia monte gordo tem wifi e fica em monte gordo"),
-verifica_sintaxe("o hotel portugues eurostars oasis plaza tem piscina e quartos com wifi").
+verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,4,estrelas]),
+\+verifica_sintaxe([a,hotel,eurostars,porto,douro,fica,em,faro,e,possui,4,estrelas]),
+\+verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,1,estrelas]),
+verifica_sintaxe([o,hotel,the,lince,azores,great,hotel,e,em,ponta,delgada]),
+verifica_sintaxe([o,yellow,praia,monte,gordo,tem,wifi,e,fica,em,monte,gordo]),
+verifica_sintaxe([o,hotel,portugues,eurostars,oasis,plaza,tem,piscina,e,quartos,com,wifi]).
 
 nome(s-m) --> [hotel].
 nome(p-m) --> [hoteis].
