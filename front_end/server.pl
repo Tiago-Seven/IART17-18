@@ -115,10 +115,10 @@ print_header_line(_).
 % parse_input(X, X).
 parse_input(respondePrimeiro([X|_]),X).
 parse_input(respondeIgual(X),X).
-parse_input(responde(X),Y):- atomToString(X,[],FraseR),reverse(FraseR,Frase),if_then_else(frase(Frase,[]), Y = 'Yayy', Y = 'nooo').
+parse_input(responde(X),Y):-if_then_else(frase(X,[]), Y = 'Yayy', Y = 'nooo').
 
 atomToString([],Aux,Aux).
-atomToString([X|Resto],Aux,Fim):-atomToString(Resto,[X|Aux],Fim).
+atomToString([X|Resto],Aux,Fim):-name(X, String),atomToString(Resto,[String|Aux],Fim).
 
 
 if_then_else(Condition, Action1, _) :- Condition, !, Action1.  

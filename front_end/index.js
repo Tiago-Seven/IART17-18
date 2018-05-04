@@ -65,8 +65,8 @@ $(".mytext").on("keydown", function (e) {
       text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ");
       text = text.trim();
       text = text.replace(/([A-Z])/g, "$1").toLowerCase();
-      text = removeDiacritics(text).split(/\s+/);
-      let message = JSON.stringify(text);
+      array = removeDiacritics(text).split(/\s+/);
+      let message = JSON.stringify(array);
       message = message.replace(/"/g, "");
       response = makeRequest("responde(" + message +")");
       console.log("responde(" + message + ")");
@@ -74,6 +74,15 @@ $(".mytext").on("keydown", function (e) {
     }
   }
 });
+
+function convertAllNum(array) {
+  let returnArray = [];
+  for (let index = 0; index < array.length; index++) {
+    let element = convertNum(array[index]);
+    returnArray.push(element);
+  }
+  return returnArray;
+}
 
 function removeDiacritics(str) {
 
