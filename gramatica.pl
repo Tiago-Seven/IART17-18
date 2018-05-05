@@ -16,8 +16,8 @@ hotel("Crowne Plaza Vilamoura,Vilamoura",8.5,5,[[wifi],[piscina]]).
 hotel("Marques de Pombal,Lisboa",4.5,4,[[wifi]]).
 hotel("Eurostars Porto Douro,Porto",8.7,4,[[baby-sitting],[restaurante],[estacionamento]]).
 hotel("Eurostars Oasis Plaza,Figueira da Foz",8.8,4,[[wifi],[piscina],[pisos,para,fumadores],[restaurante],[baby-sitting],[estacionamento],[vista, de, mar]]).
-
-frase --> frase_declarativa(_-_).
+% Sujeito,Acao,Local,Rating,ComparadorRating,Estrelas,ComparadorEstrelas,ArrayServicos,
+frase --> frase_declarativa(_-_,).
 frase --> frase_interrogativa(_-_).
 frase --> frase_conjuntiva(_-_).
 frase_interrogativa(X-Y) --> forma_frase_interrogativa(X-Y).
@@ -28,8 +28,8 @@ forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y), nome(X-Y), 
 forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y),nome(X-Y), pronome(X-Y), sintagma_verbal(X-Y).
 forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y), nome(X-Y), preposicao(Z-P), nome(Z-P), pronome(X-Y), sintagma_verbal(X-Y).
 forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y), nome(X-Y), preposicao(Z-P), nome(Z-P), comparacao(_-_).
-frase_declarativa(X-Y) --> sintagma_nominal(X-Y), sintagma_verbal(X-Y).
 frase_declarativa(X-Y) --> sintagma_nominal(X-Y), sintagma_verbal(X-Y), uma_ou_mais_conjucoes(_-_).
+frase_declarativa(X-Y) --> sintagma_nominal(X-Y), sintagma_verbal(X-Y).
 frase_conjuntiva(X-Y) --> conjuncao(X-Y), sintagma_nominal_preposicional(X-Y).
 sintagma_nominal(s-m) --> [o],[hotel],adjetivo(s-m),nome(s-m).
 sintagma_nominal(X-Y) --> (quantificador(X-Y),nome(X-Y), adjetivo(X-Y)).
@@ -44,7 +44,6 @@ sintagma_nominal_preposicional(X-Y) --> (preposicao(X-Y), nome(X-Y)) ; (preposic
 sintagma_nominal_interrogativo(X-Y) --> sintagma_nominal_preposicional(X-Y).
 sintagma_nominal_interrogativo(X-Y) --> sintagma_nominal_preposicional(X-Y), sintagma_nominal_interrogativo(_-_).
 comparacao(X-Y) --> comparador(X-Y),sintagma_nominal(X-Y).
-sintagma_verbal(X-Y) --> verbo(X-Y).
 sintagma_verbal(X-Y) --> verbo(X-Y), sintagma_nominal(_-_).
 sintagma_verbal(X-Y) --> verbo(X-Y), nome(_-_), uma_ou_mais_conjucoes(_-_).
 sintagma_verbal_interrogativo(X-Y) --> verbo(X-Y), sintagma_nominal(X-Y).
