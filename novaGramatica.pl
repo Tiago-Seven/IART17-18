@@ -1,7 +1,7 @@
 % Sujeito,Acao,Local,Rating,ComparadorRating,Estrelas,ComparadorEstrelas,ArrayServicos,
 :- consult('dados.pl').
 
-frase --> frase_conjuntiva(_-_).
+frase(_,Output) --> frase_conjuntiva(Output).
 frase(S,Output) --> {remove_modificados},frase_interrogativa(_,S,Output).
 frase(S,Output) --> {remove_modificados},frase_declarativa(S,Output).
 
@@ -21,6 +21,7 @@ sujeito(N-G,S,Input,Output) --> nome(N-G,S,_),s_n_preposicional(N-G,Input,Output
 s_n_preposicional(X-Y,Input,Output,Tipo) --> (preposicao(X-Y,Prep), nome(X-Y,Atr,Prep),{nome_atributo(Atr),once(append(Input,[atributo-Atr],Output))}) ;
   (preposicao(X-Y,Prep),numero(Z-P,N),nome(Z-P,estrela,Prep),{once(append(Input,[estrelas-igual-N],Output)),!}) ; 
   (preposicao(Z-P,Prep), comparacao(Z-P,Prep,Input,Output));
+  (preposicao(Z-P,Prep), adv_quantidade(Z-P,Comparador),numero(Z-P,N),nome(Z-P,estrela,Prep),{once(append(Input,[estrelas-Comparador-N],Output)),!});
   (demonstrativo(Z-P,Prep), nome(Z-P,Lugar,Prep),{nome_lugar(Lugar),once(append(Input,[lugar-Lugar],Output))});
   ({Tipo=i},preposicao(Z-P,Prep),nome(Z-P,Lugar,Prep),{nome_lugar(Lugar),once(append(Input,[lugar-Lugar],Output))});
   ({Tipo=i},preposicao(Z-P,Prep),nome(Z-P,Hotel,Prep),{hotel(Hotel),once(append(Input,[hotel-Hotel],Output))}).
@@ -34,8 +35,8 @@ sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_lugar(Verbo)}, {!}, preposic
   {preposicao_lugar(Prep)},nome(N1-G1,Lugar,Prep),{nome_lugar(Lugar)},{once(append(Input,[lugar-Lugar],Output))}.
 sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_REC(Verbo)},comparacao(_-_,_,Input,Output).
 sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_REC(Verbo)},numero(Z-P,Valor),nome(Z-P,estrela,_),{once(append(Input,[estrelas-igual-Valor],Output))}.
-sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_atributo(Verbo)},nome(N-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],Output))}.
-sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_atributo(Verbo)},nome(N-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],OutputAtr))},um_ou_mais_atributos(_-_,OutputAtr,Output).
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],Output))}.
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],OutputAtr))},um_ou_mais_atributos(_-_,OutputAtr,Output).
 
 um_ou_mais_conjuncoes(N,S,Input,Output) --> conjuncao(N-S), sv(N,S,Input,Output).
 um_ou_mais_conjuncoes(N,S,Input,Output) --> conjuncao(N-S), sv(N,S,Input,OutputSV),um_ou_mais_conjuncoes(N,S,OutputSV,Output).
@@ -46,7 +47,8 @@ um_ou_mais_atributos(_-_,Input,Output) --> conjuncao(X-Y),nome(X-Y,Atr,_),{nome_
 
 
 frase_interrogativa(Q,S,Output) --> si(_,Q,S,Output), {perguntavel(S)}.
-frase_interrogativa(Q,S,Output) --> si(_,Q,S,OutputSI), {perguntavel(S)} ,svi(_,S,OutputSI,Output).
+frase_interrogativa(Q,S,Output) --> si(_,Q,S,OutputSI), {perguntavel(S)}, svi(_,S,OutputSI,Output).
+frase_interrogativa(Q,S,Output) --> si(_,Q,S,OutputSI), {perguntavel(S)}, svi(_,S,OutputSI,OutputSVI), um_ou_mais_conjuncoes_i(_,S,OutputSVI,Output).
 
 si(N,Q,S,Output) --> pronome_i(N-G,Pronome), {pronome_i2tipo(Pronome,Q)} , sni(N-G,S,Output).
 si(N,Q,_,_) --> pronome_i(N-_,Pronome), {pronome_i2tipo(Pronome,Q)}.
@@ -81,6 +83,11 @@ svi(N,S,Input,Output) --> verbo(N,existir,S,i),um_ou_mais_s_n_preposicional(_-_,
 um_ou_mais_s_n_preposicional(_-_,Input,Output) --> s_n_preposicional(_-_,Input,Output,i).
 um_ou_mais_s_n_preposicional(_-_,Input,Output) --> s_n_preposicional(_-_,Input,Output1,i),um_ou_mais_s_n_preposicional(_-_,Output1,Output).
 
+um_ou_mais_conjuncoes_i(N,S,Input,Output) --> conjuncao(N-S), svi(N,S,Input,Output).
+um_ou_mais_conjuncoes_i(N,S,Input,Output) --> conjuncao(N-S), svi(N,S,Input,OutputSV),um_ou_mais_conjuncoes_i(N,S,OutputSV,Output).
+
+frase_conjuntiva(Output) --> conjuncao(_-_),um_ou_mais_s_n_preposicional(_-_,[],Output).
+
 % nothing --> [].
 
 remove_modificados:-
@@ -106,6 +113,11 @@ t_nova_gramat_i:-
   verifica_sintaxe([que,servicos,disponibiliza,o,hotel,eurostars,porto,douro]),
   \+verifica_sintaxe([que,servicos,disponibilizam,o,hotel,eurostars,porto,douro]),
   verifica_sintaxe([quais,servicos,disponibiliza,o,eurostars,porto,douro]),
+  verifica_sintaxe([quais,os,hoteis,de,faro,que,possuem,categoria,inferior,a,4,e,tem,quartos,com,vista,de,mar]),
+  verifica_sintaxe([quantos,hoteis,tem,wifi,e,babysitting,e,piscina]),
+  verifica_sintaxe([quais,os,hoteis,com,rating,inferior,a,8]),
+  \+verifica_sintaxe([qual,os,hoteis,com,rating,inferior,a,8]),
+  verifica_sintaxe([quantos,sao,os,hoteis,do,porto]),
   verifica_sintaxe([que,rating,tem,o,eurostars,oasis,plaza]).
 
 
@@ -123,18 +135,12 @@ t_nova_gramat_d :-
   \+verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,1,estrelas]),
   verifica_sintaxe([o,yellow,praia,monte,gordo,tem,wifi,e,fica,em,monte,gordo]).
 
-testes_interrogativas:-
-  verifica_sintaxe([quais,os,hoteis,que,possuem,servico,de,babysitting]),
-  verifica_sintaxe([quais,os,hoteis,de,faro,que,possuem,categoria,inferior,a,4,e,quartos,com,vista,de,mar]),
-  verifica_sintaxe([quantos,hoteis,tem,wifi,e,babysitting,e,piscina]),
-  verifica_sintaxe([quais,os,hoteis,com,rating,inferior,a,8]),
-  \+verifica_sintaxe([qual,os,hoteis,com,rating,inferior,a,8]),
-  verifica_sintaxe([quantos,sao,os,hoteis,do,porto]).
-
 testes_conjuntivas :-
   verifica_sintaxe([e,em,coimbra]),
-  verifica_sintaxe([e,com,wifi]).
-
+  verifica_sintaxe([e,com,wifi]),
+  verifica_sintaxe([e,em,coimbra,com,wifi]),
+  verifica_sintaxe([e,com,mais,de,3,estrelas]).
+  
 if_then_else(Condition, Action1, _) :- Condition, !, Action1.  
 if_then_else(_, _, Action2) :- Action2.
 

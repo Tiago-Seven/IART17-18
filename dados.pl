@@ -37,6 +37,8 @@ nome(s-m,hotel,_Prep) --> [hotel].
   nome(p-m,servico,_Prep) --> [servicos].
   nome(s-m,vista-mar,com) --> [quarto,com,vista,para,o,mar].
   nome(p-m,vista-mar,com) --> [quartos,com,vista,para,o,mar].
+  nome(s-m,vista-mar,com) --> [quarto,com,vista,de,mar].
+  nome(p-m,vista-mar,com) --> [quartos,com,vista,de,mar].
   nome(s-f,vista-mar,com) --> [vista,de,mar].
   nome(s-f,vista-mar,com) --> [vista,para,o,mar].
   nome(s-_,wifi,com) --> [wifi].
@@ -182,7 +184,8 @@ comparador(s-_,maior) --> [superior].
   comparador(s-_,igual) --> [igual].
   comparador(p-_,igual) --> [iguais].
 
-
+adv_quantidade(_-_,maior) --> [mais,de].
+adv_quantidade(_-_,menor) --> [menos,de].
 
 adjetivo(s-_) --> [parisiense].
   adjetivo(p-_) --> [parisienses].
