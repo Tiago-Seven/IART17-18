@@ -52,7 +52,7 @@ nome(s-m,hotel,_Prep) --> [hotel].
   nome(s-m,estacionamento,com) --> [estacionamento].
   nome(s-m,estacionamento,com) --> [parque].
   nome(s-m,estacionamento,com) --> [parque,de,estacionamento].
-  nome(s-m,rating,com) --> [rating].
+  nome(s-m,rating,Prep) --> [rating],{Prep=com;Prep=do}.
   nome(s-m,hotel-borges-chiado,_Prep) --> [hotel,borges,chiado].
   nome(s-m,hotel-borges-chiado,_Prep) --> [borges,chiado].
   nome(s-m,turim-terreiro-do-paco,_Prep) --> [turim,terreiro,do,paco].
@@ -76,9 +76,49 @@ nome(s-m,hotel,_Prep) --> [hotel].
   nome(s-m,crowne-plaza-vilamoura,_Prep) --> [crowne,plaza,vilamoura].
   nome(s-m,marques-de-pombal,_Prep) --> [marques,de,pombal].
   nome(s-m,eurostars-oasis-plaza,_Prep) --> [eurostars,oasis,plaza].
+
+  nome(s-m,hotel-borges-chiado,_Prep) --> [hotel,borges,chiado].
+  nome(s-m,turim-terreiro-do-paco,_Prep) --> [hotel,turim,terreiro,do,paco].
+  nome(s-m,turim-terreiro-do-paco,_Prep) --> [hotel,turim].
+  nome(s-m,tryp-colina-do-castelo,_Prep) --> [hotel,tryp,colina,do,castelo].
+  nome(s-m,tryp-colina-do-castelo,_Prep) --> [hotel,colina,do,castelo].
+  nome(s-m,pedras-do-mar-resort-and-spa,_Prep) --> [hotel,pedras,do,mar,resort,and,spa].
+  nome(s-m,pedras-do-mar-resort-and-spa,_Prep) --> [hotel,pedras,do,mar].
+  nome(s-m,santa-cruz,_Prep) --> [hotel,santa,cruz].
+  nome(s-m,yellow-praia-monte-gordo,_Prep) --> [hotel,yellow,praia,monte,gordo].
+  nome(s-m,yellow-praia-monte-gordo,_Prep) --> [hotel,yellow,monte,gordo].
+  nome(s-m,tryp-lisboa-caparica-mar,_Prep) --> [hotel,tryp,lisboa,caparica,mar].
+  nome(s-m,tryp-lisboa-caparica-mar,_Prep) --> [hotel,tryp,caparica,mar].
+  nome(s-m,alfamar-beach-and-sport-resort,_Prep) --> [hotel,alfamar,beach,and,sport,resort].
+  nome(s-m,alfamar-beach-and-sport-resort,_Prep) --> [hotel,alfamar,resort].
+  nome(s-m,melia-braga-hotel,_Prep) --> [hotel,melia,braga,hotel].
+  nome(s-m,melia-braga-hotel,_Prep) --> [hotel,melia,hotel].
+  nome(s-m,the-lince-azores-great-hotel,_Prep) --> [hotel,the,lince,azores,great,hotel].
+  nome(s-m,the-lince-azores-great-hotel,_Prep) --> [hotel,the,lince,great,hotel].
+  nome(s-m,crowne-plaza-vilamoura,_Prep) --> [hotel,crowne,plaza,vilamoura].
+  nome(s-m,marques-de-pombal,_Prep) --> [hotel,marques,de,pombal].
+  nome(s-m,eurostars-oasis-plaza,_Prep) --> [hotel,eurostars,oasis,plaza].
+  nome(s-m,eurostars-porto-douro,_Prep) --> [hotel,eurostars,porto,douro].
   nome(s-f,manel,_Prep) --> [manel].
   nome(s-f,estadia,_Prep) --> [estadia].
 
+nome_lugar(Lugar):-
+  local(Lugar).
+
+sujeito_atributo(servico).
+
+nome_atributo(vista-mar).
+nome_atributo(wifi).
+nome_atributo(piscina).
+nome_atributo(babysitting).
+nome_atributo(piso-fumar).
+nome_atributo(estacionamento).
+
+perguntavel(hotel).
+perguntavel(rating).
+perguntavel(categoria).
+perguntavel(estrelas).
+perguntavel(servico).
  
 preposicao(s-m,do) --> [do].
   preposicao(p-m,dos) --> [dos].
@@ -109,15 +149,6 @@ demonstrativo_nome(do,porto).
 preposicao_lugar(Prep):-
   (Prep=no;Prep=nos;Prep=na;Prep=nas;Prep=em).
 
-nome_lugar(Lugar):-
-  local(Lugar).
-
-nome_atributo(vista-mar).
-nome_atributo(wifi).
-nome_atributo(piscina).
-nome_atributo(babysitting).
-nome_atributo(piso-fumar).
-nome_atributo(estacionamento).
 
 digito(s-_,1) --> [1].
   digito(p-_,2) --> [2].
@@ -158,24 +189,46 @@ adjetivo(s-_) --> [parisiense].
   adjetivo(s-_) --> [portugues].
   adjetivo(p-_) --> [portugueses].
 
-pronome_i(p-m,qt) --> [quantos].
-  pronome_i(s-m,qt) --> [quanto].
-  pronome_i(p-f,qt) --> [quantas].
-  pronome_i(s-f,qt) --> [quanta].
-  pronome_i(p-_,ql) --> [quais].
-  pronome_i(s-_,ql) --> [qual].
-  pronome_i(_-_,ql) --> [que].
+pronome_i(p-m,quantos) --> [quantos].
+  pronome_i(s-m,quanto) --> [quanto].
+  pronome_i(p-f,quantas) --> [quantas].
+  pronome_i(p-_,quais) --> [quais].
+  pronome_i(s-_,qual) --> [qual].
+  pronome_i(_-_,que) --> [que].
 
-verbo(s,ser,S) --> [e],{hotel(S)}.
-verbo(p,ser,S) --> [sao],{hotel(S)}.
-verbo(s,ficar,S) --> [fica],{hotel(S)}.
-verbo(p,ficar,S) --> [ficam],{hotel(S)}.
-verbo(s,disponibilizar,S) --> [disponibiliza],{hotel(S)}.
-verbo(p,disponibilizar,S) --> [disponibilizam],{hotel(S)}.
-verbo(s,possuir,S) --> [possui],{hotel(S)}.
-verbo(p,possuir,S) --> [possuem],{hotel(S)}.
-verbo(s,ter,S) --> [tem],{hotel(S)}.
-verbo(p,ter,S) --> [tem],{hotel(S)}.
+pronome_i2tipo(quantos,qt).
+  pronome_i2tipo(quanto,qt).
+  pronome_i2tipo(quantas,qt).
+  pronome_i2tipo(quais,ql).
+  pronome_i2tipo(qual,ql).
+  pronome_i2tipo(que,ql).
+
+verbo(s,ser,S,d) --> [e],{hotel(S)}.
+verbo(s,ser,S,i) --> [e],{hotel(S);perguntavel(S)}.
+verbo(p,ser,S,d) --> [sao],{hotel(S)}.
+verbo(p,ser,S,i) --> [sao],{hotel(S);perguntavel(S)}.
+verbo(s,ficar,S,d) --> [fica],{hotel(S)}.
+verbo(s,ficar,S,i) --> [fica],{hotel(S);S=hotel}.
+verbo(p,ficar,S,d) --> [ficam],{hotel(S)}.
+verbo(p,ficar,S,i) --> [ficam],{hotel(S);S=hotel}.
+verbo(s,disponibilizar,S,d) --> [disponibiliza],{hotel(S)}.
+verbo(s,disponibilizar,S,i) --> [disponibiliza],{hotel(S);S=hotel;S=servico}.
+verbo(p,disponibilizar,S,d) --> [disponibilizam],{hotel(S)}.
+verbo(p,disponibilizar,S,i) --> [disponibilizam],{hotel(S);S=hotel;S=servico}.
+verbo(s,possuir,S,d) --> [possui],{hotel(S)}.
+verbo(s,possuir,S,i) --> [possui],{hotel(S);perguntavel(S)}.
+verbo(p,possuir,S,d) --> [possuem],{hotel(S)}.
+verbo(p,possuir,S,i) --> [possuem],{hotel(S);perguntavel(S)}.
+verbo(s,ter,S,d) --> [tem],{hotel(S)}.
+verbo(s,ter,S,i) --> [tem],{hotel(S);perguntavel(S)}.
+verbo(p,ter,S,d) --> [tem],{hotel(S)}.
+verbo(p,ter,S,i) --> [tem],{hotel(S);perguntavel(S)}.
+verbo(p,existir,S,d) --> [existem],{hotel(S)}.
+verbo(p,existir,S,i) --> [existem],{hotel(S);S=hotel}.
+verbo(s,existir,S,d) --> [existe],{hotel(S)}.
+verbo(s,existir,S,i) --> [existe],{hotel(S);S=hotel}.
+verbo(_,existir,S,d) --> [ha],{hotel(S)}.
+verbo(_,existir,S,i) --> [ha],{hotel(S);S=hotel}.
 
 verbo_lugar(ser).
 verbo_lugar(ficar).
