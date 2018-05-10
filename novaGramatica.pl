@@ -2,14 +2,38 @@
 :- consult('dados.pl').
 
 % {remove_modificados},
-frase(_,Output,_) --> frase_conjuntiva(Output).
-frase(S,Output,Resposta) --> {remove_modificados},frase_interrogativa(Q,S,Output),nothing,{!,responde_i(Output,S,Q,Resposta)}.
+frase(_,Output,Resposta) --> frase_conjuntiva(Output),{!,tipo_questao(Q),responde_c(Output,Q,Resposta)}.
+frase(S,Output,Resposta) --> {remove_modificados},frase_interrogativa(Q,S,Output),nothing,{!,assert(tipo_questao(Q)),responde_i(Output,S,Q,Resposta)}.
 frase(S,Output,Resposta) --> {remove_modificados},frase_declarativa(S,Output),nothing,
-  {!,verifica_output(Output),insere_restricoes(Output),assert(nome_hotel(S)),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(')}.
+  {!,verifica_output(Output),insere_restricoes(Output),assert(nome_hotel(S)),assert(tipo_questao(d)),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(')}.
+
+responde_c(Array,d,Resposta) :-
+  verifica_output(Array),retira_duplicado(Array),insere_restricoes(Array),
+  findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(').
+
+responde_c(Array,Q,Resposta) :-
+    verifica_output(Array),retira_duplicado(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  length(Hoteis,N),if_then_else(N>=1,resposta_tipo_hotel(Hoteis,Q,Resposta),(Resposta='Nao temos resultados para a sua questao :(')).
+
+retira_duplicado([]).
+retira_duplicado([lugar-Lugar|R]):-
+  if_then(lugar(_),(retractall(lugar(_)),assert(lugar(Lugar)))),
+  retira_duplicado(R).
+
+retira_duplicado([rating-Comparador-Valor|R]):-
+  if_then(lugar(_),(retractall(rating(_,_)),assert(rating(Comparador,Valor)))),
+  retira_duplicado(R).
+
+retira_duplicado([estrelas-Comparador-Valor|R]):-
+  if_then(lugar(_),(retractall(estrelas(_,_)),assert(estrelas(Comparador,Valor)))),
+  retira_duplicado(R).
+
+retira_duplicado([hotel-Hotel|R]):-
+  if_then(nome_hotel(_),(retractall(nome_hotel(_)),assert(nome_hotel(Hotel)))),
+  retira_duplicado(R).
 
 responde_i(Array,hotel,Q,Resposta) :-
   verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,resposta_tipo_hotel(Hoteis,Q,Resposta),(Resposta='Nao temos resultados para a sua questao :(')).
-
 responde_i(Array,rating,_,Resposta) :-
   verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
   nth0(0,Hoteis,Hotel),
@@ -229,7 +253,8 @@ frase_conjuntiva(Output) --> conjuncao(_-_),um_ou_mais_s_n_preposicional(_-_,[],
 % nothing --> [].
 
 remove_modificados:-
-  retractall(lugar(_)),retractall(rating(_,_)),retractall(estrelas(_,_)),retractall(atributo(_)),retractall(nome_hotel(_)).
+  retractall(lugar(_)),retractall(rating(_,_)),retractall(estrelas(_,_)),
+  retractall(atributo(_)),retractall(nome_hotel(_)),retractall(tipo_questao(_)).
 
 
 
