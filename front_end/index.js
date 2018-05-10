@@ -28,7 +28,7 @@ function insertChat(who, text, time) {
   if (who == "me") {
     control = '<li style="width:100%">' +
       '<div class="msj macro">' +
-      '<div class="avatar"><img class="img-circle" style="width:80%;" src="' + me.avatar + '" /></div>' +
+      '<div class="avatar"><img class="img-circle" style="width:80%;" src="' + you.avatar + '" /></div>' +
       '<div class="text text-l">' +
       '<p>' + text + '</p>' +
       '<p><small>' + date + '</small></p>' +
@@ -42,7 +42,7 @@ function insertChat(who, text, time) {
                     '<p>' + text + '</p>' +
                      '<p><small>' + date + '</small></p>' +
                  '</div>' +
-                '<div class="avatar" style="padding:0px 0px 0px 5px !important"><img class="img-circle" style="width:80%;" src="' + you.avatar + '" /></div>' +
+                '<div class="avatar" style="padding:0px 0px 0px 5px !important"><img class="img-circle" style="width:80%;" src="' + me.avatar + '" /></div>' +
              '</li>';
   }
   setTimeout(
@@ -60,7 +60,7 @@ $(".mytext").on("keydown", function (e) {
   if (e.which == 13) {
     var text = $(this).val();
     if (text !== "") {
-      insertChat("me", text);
+      insertChat("you", text);
       $(this).val('');
       text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ");
       text = text.trim();
@@ -69,8 +69,16 @@ $(".mytext").on("keydown", function (e) {
       let message = JSON.stringify(array);
       message = message.replace(/"/g, "");
       response = makeRequest("responde(" + message +")");
-      console.log("responde(" + message + ")");
-      insertChat("you",response,500);
+      if(response == "yes")
+        response = "Sim! :)"
+
+      if (response == "no")
+        response = "Não :("
+
+      if (response == "syntax_error")
+        response = "Não percebi o que escreveste, verifica se a frase tem algum erro por favor :)"
+
+      insertChat("me",response,500);
     }
   }
 });

@@ -1,18 +1,43 @@
-hotel(hotel-borges-chiado,lisboa,6.8,3,[[wifi]]).
-hotel(turim-terreiro-do-paco,lisboa,8.7,1,[[]]).
-hotel(tryp-colina-do-castelo,castelo-branco,8.4,4,[[restaurante]]).
-hotel(pedras-do-mar-resort-and-spa,ponta-delgada,8.6,5,[[piscina]]).
-hotel(santa-cruz,coimbra,7.0,1,[[piscina]]).
-hotel(hotel-do-mar,sesimbra,7.8,4,[[wifi]]).
-hotel(yellow-praia-monte-gordo,monte-gordo,4.7,4,[[piscina],[pisos-para-fumadores]]).
-hotel(tryp-lisboa-caparica-mar,costa-da-caparica,7.2,4,[[wifi]]).
-hotel(alfamar-beach-and-sport-resort,albufeira,7.2,4,[[wifi]]).
-hotel(melia-braga-hotel,braga,3.4,4,[[]]).
-hotel(the-lince-azores-great-hotel,ponta-delgada,7.9,4,[[piscina]]).
-hotel(crowne-plaza-vilamoura,vilamoura,8.5,5,[[wifi],[piscina]]).
-hotel(marques-de-pombal,lisboa,4.5,4,[[wifi]]).
-hotel(eurostars-porto-douro,porto,8.7,4,[[baby-sitting],[restaurante],[estacionamento]]).
-hotel(eurostars-oasis-plaza,figueira-da-foz,8.8,4,[[wifi],[piscina],[pisos-para-fumadores],[restaurante],[baby-sitting],[estacionamento],[vista-de-mar]]).
+hotel(hotel-borges-chiado,lisboa,6.8,3,[wifi]).
+hotel(turim-terreiro-do-paco,lisboa,8.7,1,[]).
+hotel(tryp-colina-do-castelo,castelo-branco,8.4,4,[restaurante]).
+hotel(pedras-do-mar-resort-and-spa,ponta-delgada,8.6,5,[piscina]).
+hotel(santa-cruz,coimbra,7.0,1,[piscina]).
+hotel(hotel-do-mar,sesimbra,7.8,4,[wifi]).
+hotel(yellow-praia-monte-gordo,monte-gordo,4.7,4,[piscina,pisos-para-fumadores]).
+hotel(tryp-lisboa-caparica-mar,costa-da-caparica,7.2,4,[wifi]).
+hotel(alfamar-beach-and-sport-resort,albufeira,7.2,4,[wifi]).
+hotel(melia-braga-hotel,braga,3.4,4,[]).
+hotel(the-lince-azores-great-hotel,ponta-delgada,7.9,4,[piscina]).
+hotel(crowne-plaza-vilamoura,vilamoura,8.5,5,[wifi,piscina]).
+hotel(marques-de-pombal,lisboa,4.5,4,[wifi]).
+hotel(eurostars-porto-douro,porto,8.7,4,[baby-sitting,restaurante,estacionamento]).
+hotel(eurostars-oasis-plaza,figueira-da-foz,8.8,4,[wifi,piscina,pisos-para-fumadores,restaurante,baby-sitting,estacionamento,vista-de-mar]).
+
+
+converte_hotel_nome(hotel-borges-chiado,'Hotel Borges Chiado').
+converte_hotel_nome(turim-terreiro-do-paco,'Hotel Turim Terreiro do Paco').
+converte_hotel_nome(tryp-colina-do-castelo,'Hotel Tryp Colina do Castelo').
+converte_hotel_nome(pedras-do-mar-resort-and-spa,'Hotel Pedras do Mar resort and spa').
+converte_hotel_nome(santa-cruz,'Hotel Santa Cruz').
+converte_hotel_nome(hotel-do-mar,'Hotel do Mar').
+converte_hotel_nome(yellow-praia-monte-gordo,'Hotel Yellow Praia Monte Gordo').
+converte_hotel_nome(tryp-lisboa-caparica-mar,'Hotel Tryp Lisboa Caparica Mar').
+converte_hotel_nome(alfamar-beach-and-sport-resort,'Hotel Alfamar Beach and Sport Resort').
+converte_hotel_nome(melia-braga-hotel,'Hotel Melia Braga').
+converte_hotel_nome(the-lince-azores-great-hotel,'The Linze Azores Great Hotel').
+converte_hotel_nome(crowne-plaza-vilamoura,'Hotel Crowne Plaza Vilamoura').
+converte_hotel_nome(marques-de-pombal,'Hotel Marques do Pombal').
+converte_hotel_nome(eurostars-porto-douro,'Hotel Eurostars Porto Douro').
+converte_hotel_nome(eurostars-oasis-plaza,'Hotel Eurostars Oasis Plaza').
+
+converte_servico_nome(wifi,'wifi').
+converte_servico_nome(restaurante,'restaurante').
+converte_servico_nome(piscina,'piscina').
+converte_servico_nome(pisos-para-fumadores,'pisos para fumadores').
+converte_servico_nome(baby-sitting,'babysitting').
+converte_servico_nome(estacionamento,'estacionamento').
+converte_servico_nome(vista-de-mar,'vista de mar').
 
 nome(s-m,hotel,_Prep) --> [hotel].
   nome(s-m,eurostars-porto-douro,_Prep) --> [eurostars,porto,douro].

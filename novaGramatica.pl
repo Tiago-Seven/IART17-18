@@ -1,10 +1,147 @@
 % Sujeito,Acao,Local,Rating,ComparadorRating,Estrelas,ComparadorEstrelas,ArrayServicos,
 :- consult('dados.pl').
 
-frase(_,Output) --> frase_conjuntiva(Output).
-frase(S,Output) --> {remove_modificados},frase_interrogativa(_,S,Output).
-frase(S,Output) --> {remove_modificados},frase_declarativa(S,Output).
+% {remove_modificados},
+frase(_,Output,_) --> frase_conjuntiva(Output).
+frase(S,Output,Resposta) --> {remove_modificados},frase_interrogativa(Q,S,Output),nothing,{!,responde_i(Output,S,Q,Resposta)}.
+frase(S,Output,Resposta) --> {remove_modificados},frase_declarativa(S,Output),nothing,
+  {!,verifica_output(Output),insere_restricoes(Output),assert(nome_hotel(S)),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(')}.
 
+responde_i(Array,hotel,Q,Resposta) :-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,resposta_tipo_hotel(Hoteis,Q,Resposta),(Resposta='Nao temos resultados para a sua questao :(')).
+
+responde_i(Array,rating,_,Resposta) :-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  nth0(0,Hoteis,Hotel),
+  hotel(Hotel,_,Rating,_,_),
+  number_chars(Rating, Chars),
+  atom_chars(T, Chars),
+  atom_concat('O hotel tem o rating de: ',T,Resposta).
+
+responde_i(Array,estrelas,_,Resposta) :-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  nth0(0,Hoteis,Hotel),
+  hotel(Hotel,_,_,Estrelas,_),
+  number_chars(Estrelas, Chars),
+  atom_chars(T, Chars),
+  atom_concat('O hotel tem ',T,Aux),
+  if_then_else(Estrelas > 1, atom_concat(Aux,' estrelas ',Resposta),atom_concat(Aux,' estrela ',Resposta)).
+
+responde_i(Array,servico,Q,Resposta):-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  nth0(0,Hoteis,Hotel),
+  hotel(Hotel,_,_,_,Servicos),
+  resposta_tipo_servicos(Servicos,Q,Resposta).
+
+resposta_tipo_servicos(Servicos,qt,Resposta):-
+  length(Servicos,Tamanho),
+  number_chars(Tamanho, Chars),
+  atom_chars(T, Chars),
+  atom_concat('O hotel tem ',T,RAux),
+  if_then_else(Tamanho > 1, atom_concat(RAux,' servicos ',Resposta),atom_concat(RAux,' servico ',Resposta)).
+
+resposta_tipo_servicos(Servicos,ql,Resposta):-
+  percorre_servicos(Servicos,[],RespostaAux),
+  length(Servicos,Tamanho),
+  if_then_else(Tamanho<1,Resposta='O hotel nao tem servicos',(
+  array_para_string(RespostaAux,' ',RespostaAux2),
+  if_then_else(Tamanho > 1,atom_concat('Encontrei os seguintes servicos: ',RespostaAux2,Resposta),
+    atom_concat('Encontrei o seguinte servico: ',RespostaAux2,Resposta))
+  )).
+
+percorre_servicos([],Resposta,Resposta).
+percorre_servicos([S|Resto],RespostaAux,Resposta):-
+  converte_servico_nome(S,Nome),
+  percorre_servicos(Resto,[Nome|RespostaAux],Resposta).
+
+
+resposta_tipo_hotel(Hoteis,qt,Resposta):-
+  length(Hoteis,Tamanho),
+  number_chars(Tamanho, Chars),
+  atom_chars(T, Chars),
+  atom_concat('Encontrei ',T,RAux),
+  if_then_else(Tamanho > 1, atom_concat(RAux,' hoteis ',Resposta),atom_concat(RAux,' hotel ',Resposta)).
+
+resposta_tipo_hotel(Hoteis,ql,Resposta):-
+  percorre_hoteis(Hoteis,[],RespostaAux),
+  length(Hoteis,Tamanho),
+  array_para_string(RespostaAux,' ',RespostaAux2),
+  if_then_else(Tamanho > 1,atom_concat('Encontrei os seguintes hoteis: ',RespostaAux2,Resposta),
+    atom_concat('Encontrei o seguinte hotel: ',RespostaAux2,Resposta)).
+
+array_para_string([H],Aux,Resposta):-
+  atom_concat(H,Aux,Resposta).
+
+array_para_string([H|Resto],Aux,Resposta):-
+  atom_concat(Aux,' , ',Aux2),
+  atom_concat(Aux2,H,Final),
+  array_para_string(Resto,Final,Resposta).
+
+
+
+percorre_hoteis([],Resposta,Resposta).
+percorre_hoteis([H|Resto],RespostaAux,Resposta):-
+  converte_hotel_nome(H,Nome),
+  percorre_hoteis(Resto,[Nome|RespostaAux],Resposta).
+
+responde(Nome) :-
+  hotel(Nome,Lugar,Rating,Estrelas,Atributos),
+  once((if_then(nome_hotel(_),nome_hotel(Nome)),
+  if_then(lugar(_),lugar(Lugar)),
+  if_then(rating(_,_),(rating(Comparador,Valor),restringe_valor(Rating,Comparador,Valor))),
+  if_then(estrelas(_,_),(estrelas(Comparador,Valor),restringe_valor(Estrelas,Comparador,Valor))),
+  if_then(atributo(_),restringe_atributos(Atributos)))).  
+
+% [lugar-porto,atributo-wifi,estrelas-igual-3,lugar-coimbra]
+restringe_atributos(Atributos) :-
+  findall(A,atributo(A),L),
+  verifica_atributos(L,Atributos).
+
+verifica_atributos([],_).
+verifica_atributos([Elem|R],B):-
+  member(Elem,B),
+  verifica_atributos(R,B).
+
+
+restringe_valor(Variavel,maior,Valor) :-
+  Variavel > Valor.
+
+restringe_valor(Variavel,menor,Valor) :-
+  Variavel < Valor.
+
+restringe_valor(Variavel,igual,Variavel).
+
+verifica_output(Array) :-
+  findall(_,(member(lugar-_,Array)),Lugares),
+  findall(_,(member(estrelas-_-_,Array)),Estrelas),
+  findall(_,(member(rating-_-_,Array)),Rating),
+  length(Lugares,NLugares),
+  length(Estrelas,NEstrelas),
+  length(Rating,NRating),
+  NLugares =< 1,
+  NEstrelas =< 1,
+  NRating =< 1.
+
+insere_restricoes([]).
+insere_restricoes([lugar-Lugar|R]) :-
+  assert(lugar(Lugar)),
+  insere_restricoes(R).
+
+insere_restricoes([atributo-Atributo|R]) :-
+  assert(atributo(Atributo)),
+  insere_restricoes(R).
+
+insere_restricoes([hotel-Hotel|R]) :-
+  assert(nome_hotel(Hotel)),
+  insere_restricoes(R).
+
+insere_restricoes([estrelas-Comparador-Estrelas|R]) :-
+  assert(estrelas(Comparador,Estrelas)),
+  insere_restricoes(R).
+
+insere_restricoes([rating-Comparador-Rating|R]) :-
+  assert(rating(Comparador,Rating)),
+  insere_restricoes(R).
 
 
 frase_declarativa(S,OutputSV) --> sn(N,S,[],OutputSN), sv(N,S,OutputSN,OutputSV).
@@ -13,8 +150,8 @@ frase_declarativa(S,OutputUOMC) --> sn(N,S,[],OutputSN), sv(N,S,OutputSN,OutputS
 % sintagma nominal
  %sem "com"  
 sn(N,S,Input,Output) --> determinante(N-G,_),sujeito(N-G,S,Input,Output).
+
 sujeito(N-G,S,_,_) --> nome(N-G,S,_).
-sujeito(N-G,S,_,_) --> nome(_-_,hotel,_), nome(N-G,S,_).
  %com "com"  
 sujeito(N-G,S,Input,Output) --> nome(N-G,S,_),s_n_preposicional(N-G,Input,Output,d).
 
@@ -72,6 +209,7 @@ svi(_,S,Input,Output) --> verbo(_,Verbo,S,i), {verbo_atributo(Verbo)},nome(_-_,A
 svi(_,S,Input,Output) --> verbo(_,Verbo,S,i), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],OutputAtr))},um_ou_mais_atributos(_-_,OutputAtr,Output).
 svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_atributo(Verbo),sujeito_atributo(S)},determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append(Input,[hotel-Hotel],Output))}.
 svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_atributo(Verbo),sujeito_atributo(S)},determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append(Input,[hotel-Hotel],OutputHotel))},um_ou_mais_s_n_preposicional(_-_,OutputHotel,Output).
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_REC(Verbo)},adv_quantidade(Z-P,Comparador),numero(Z-P,Valor),nome(Z-P,estrela,_),{once(append(Input,[estrelas-Comparador-Valor],Output))}.
 svi(N,S,A,A) --> verbo(N,existir,S,i).
 svi(N,S,Input,Output) --> verbo(N,existir,S,i),preposicao(N1-G1,Prep),
   {preposicao_lugar(Prep)},nome(N1-G1,Lugar,Prep),{nome_lugar(Lugar)},{once(append(Input,[lugar-Lugar],Output))}.
@@ -91,11 +229,11 @@ frase_conjuntiva(Output) --> conjuncao(_-_),um_ou_mais_s_n_preposicional(_-_,[],
 % nothing --> [].
 
 remove_modificados:-
-  retractall(lugar(_)),retractall(rating(_,_)),retractall(estrelas(_,_)).
+  retractall(lugar(_)),retractall(rating(_,_)),retractall(estrelas(_,_)),retractall(atributo(_)),retractall(nome_hotel(_)).
 
 
 
-verifica_sintaxe(X) :-frase(_,_,X,[]).
+verifica_sintaxe(X) :-frase(_,_,_,X,[]).
 
 % TODO ver cenas compatives por exemplo hotel/rating mas nao servico/atributo
 t_nova_gramat_i:-
@@ -123,7 +261,6 @@ t_nova_gramat_i:-
 
 t_nova_gramat_d :-
   verifica_sintaxe([o,hotel,eurostars,porto,douro,com,4,estrelas,fica,em,faro]),
-  verifica_sintaxe([o,hotel,eurostars,porto,douro,de,faro,fica,em,faro]),
   verifica_sintaxe([o,hotel,eurostars,porto,douro,com,categoria,superior,a,3,estrelas,fica,em,faro]),
   verifica_sintaxe([o,hotel,eurostars,porto,douro,com,categoria,superior,a,3,fica,em,faro]),
   verifica_sintaxe([o,hotel,eurostars,porto,douro,com,rating,superior,a,3,fica,em,faro]),
@@ -143,5 +280,7 @@ testes_conjuntivas :-
   
 if_then_else(Condition, Action1, _) :- Condition, !, Action1.  
 if_then_else(_, _, Action2) :- Action2.
+
+if_then(Condition, Action1) :- if_then_else(Condition,Action1,true).  
 
 nothing(A,[]):-A=[].

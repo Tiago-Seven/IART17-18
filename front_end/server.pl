@@ -3,7 +3,7 @@
 :-use_module(library(codesio)).
 :- use_module(library(random)).
 :- use_module(library(system)).
-:- consult('../gramatica.pl').
+:- consult('../novaGramatica.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%                                        Server                                                   %%%%
@@ -115,14 +115,11 @@ print_header_line(_).
 % parse_input(X, X).
 parse_input(respondePrimeiro([X|_]),X).
 parse_input(respondeIgual(X),X).
-parse_input(responde(X),Y):-if_then_else(frase(X,[]), Y = 'Yayy', Y = 'nooo').
+parse_input(responde(X),Y):-if_then_else(frase(_,_,Y,X,[]),true,Y=syntax_error).
 
 atomToString([],Aux,Aux).
 atomToString([X|Resto],Aux,Fim):-name(X, String),atomToString(Resto,[String|Aux],Fim).
 
-
-if_then_else(Condition, Action1, _) :- Condition, !, Action1.  
-if_then_else(_, _, Action2) :- Action2.
 
 test(_,[],N) :- N =< 0.
 test(A,[A|Bs],N) :- N1 is N-1, test(A,Bs,N1).
