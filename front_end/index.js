@@ -3,8 +3,27 @@ me.avatar = "user.png";
 
 var you = {};
 you.avatar = "bot.png";
+let recognition = new webkitSpeechRecognition();
+recognition.lang = "pt-PT";
+recognition.continuous = true;
+let mic = document.querySelector('.fa-microphone')
+mic.onmousedown = function(){
+  recognition.start();
+}
 
-let ente
+mic.onmouseup = function() {
+  recognition.stop();
+}
+
+
+recognition.onresult = function (event) {
+  let textInput = document.querySelector(".mytext");
+  textInput.value = event.results[0][0].transcript;
+  
+   
+};
+
+
 
 function formatAMPM(date) {
   var hours = date.getHours();
