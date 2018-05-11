@@ -2,8 +2,8 @@
 :- consult('dados.pl').
 
 % {remove_modificados},
-frase(_,Output,Resposta) --> frase_conjuntiva(Output),{!,tipo_questao(Q),responde_c(Output,Q,Resposta)}.
-frase(S,Output,Resposta) --> {remove_modificados},frase_interrogativa(Q,S,Output),nothing,{!,assert(tipo_questao(Q)),responde_i(Output,S,Q,Resposta)}.
+frase(_,Output,Resposta) --> frase_conjuntiva(Output),nothing,{!,tipo_questao(Q),responde_c(Output,Q,Resposta)}.
+frase(S,Output,Resposta) --> {remove_modificados},frase_interrogativa(Q,S,Output),nothing,{!,assert(tipo_questao(Q)),assert(sujeito_questao(S)),responde_i(Output,S,Q,Resposta)}.
 frase(S,Output,Resposta) --> {remove_modificados},frase_declarativa(S,Output),nothing,
   {!,verifica_output(Output),insere_restricoes(Output),assert(nome_hotel(S)),assert(tipo_questao(d)),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(')}.
 
@@ -12,8 +12,7 @@ responde_c(Array,d,Resposta) :-
   findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(').
 
 responde_c(Array,Q,Resposta) :-
-    verifica_output(Array),retira_duplicado(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
-  length(Hoteis,N),if_then_else(N>=1,resposta_tipo_hotel(Hoteis,Q,Resposta),(Resposta='Nao temos resultados para a sua questao :(')).
+    retira_duplicado(Array),sujeito_questao(S),responde_i(Array,S,Q,Resposta).
 
 retira_duplicado([]).
 retira_duplicado([lugar-Lugar|R]):-
@@ -32,6 +31,9 @@ retira_duplicado([hotel-Hotel|R]):-
   if_then(nome_hotel(_),(retractall(nome_hotel(_)),assert(nome_hotel(Hotel)))),
   retira_duplicado(R).
 
+retira_duplicado([_|R]):-
+  retira_duplicado(R).
+
 responde_i(Array,hotel,Q,Resposta) :-
   verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,resposta_tipo_hotel(Hoteis,Q,Resposta),(Resposta='Nao temos resultados para a sua questao :(')).
 responde_i(Array,rating,_,Resposta) :-
@@ -42,7 +44,7 @@ responde_i(Array,rating,_,Resposta) :-
   atom_chars(T, Chars),
   atom_concat('O hotel tem o rating de: ',T,Resposta).
 
-responde_i(Array,estrelas,_,Resposta) :-
+responde_i(Array,estrela,_,Resposta) :-
   verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
   nth0(0,Hoteis,Hotel),
   hotel(Hotel,_,_,Estrelas,_),
@@ -249,12 +251,14 @@ um_ou_mais_conjuncoes_i(N,S,Input,Output) --> conjuncao(N-S), svi(N,S,Input,Outp
 um_ou_mais_conjuncoes_i(N,S,Input,Output) --> conjuncao(N-S), svi(N,S,Input,OutputSV),um_ou_mais_conjuncoes_i(N,S,OutputSV,Output).
 
 frase_conjuntiva(Output) --> conjuncao(_-_),um_ou_mais_s_n_preposicional(_-_,[],Output).
+frase_conjuntiva(Output) --> conjuncao(_-_),determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append([],[hotel-Hotel],Output))}.
+frase_conjuntiva([]) --> conjuncao(_-_),pronome_i(N-G,Pronome), {pronome_i2tipo(Pronome,Q)},nome(N-G,Perguntavel,_),{perguntavel(Perguntavel),retractall(tipo_questao(_)),assert(tipo_questao(Q)),retractall(sujeito_questao(_)),assert(sujeito_questao(Perguntavel))}.
 
 % nothing --> [].
 
 remove_modificados:-
   retractall(lugar(_)),retractall(rating(_,_)),retractall(estrelas(_,_)),
-  retractall(atributo(_)),retractall(nome_hotel(_)),retractall(tipo_questao(_)).
+  retractall(atributo(_)),retractall(nome_hotel(_)),retractall(tipo_questao(_)),retractall(sujeito_questao(_)).
 
 
 
@@ -298,10 +302,16 @@ t_nova_gramat_d :-
   verifica_sintaxe([o,yellow,praia,monte,gordo,tem,wifi,e,fica,em,monte,gordo]).
 
 testes_conjuntivas :-
-  verifica_sintaxe([e,em,coimbra]),
+  verifica_sintaxe([quantos,sao,os,hoteis,do,porto]),
   verifica_sintaxe([e,com,wifi]),
+  verifica_sintaxe([e,em,coimbra]),
   verifica_sintaxe([e,em,coimbra,com,wifi]),
-  verifica_sintaxe([e,com,mais,de,3,estrelas]).
+  verifica_sintaxe([e,com,mais,de,3,estrelas]),
+  verifica_sintaxe([quantas,estrelas,tem,o,eurostars,oasis,plaza]),
+  verifica_sintaxe([e,o,turim]),
+  verifica_sintaxe([e,quanto,rating]),
+  verifica_sintaxe([e,quantos,servicos]),
+  verifica_sintaxe([e,quais,servicos]).
   
 if_then_else(Condition, Action1, _) :- Condition, !, Action1.  
 if_then_else(_, _, Action2) :- Action2.

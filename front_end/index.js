@@ -62,7 +62,7 @@ $(".mytext").on("keydown", function (e) {
     if (text !== "") {
       insertChat("you", text);
       $(this).val('');
-      text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ");
+      text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\?]/g, " ");
       text = text.trim();
       text = text.replace(/([A-Z])/g, "$1").toLowerCase();
       array = removeDiacritics(text).split(/\s+/);
@@ -75,7 +75,7 @@ $(".mytext").on("keydown", function (e) {
       if (response == "no")
         response = "Não :("
 
-      if (response == "syntax_error")
+      if (response == "syntax_error" || response == "Bad Request")
         response = "Não percebi o que escreveste, verifica se a frase tem algum erro por favor :)"
 
       insertChat("me",response,500);
@@ -453,7 +453,7 @@ $('body > div > div > div:nth-child(2) > span').click(function () {
 resetChat();
 
 //-- Print Messages
-insertChat("me", "Hello...", 0);
+insertChat("me", "Hello :D", 0);
 
 
 
@@ -463,7 +463,7 @@ insertChat("me", "Hello...", 0);
 let message = "";
 
 function getPrologRequest(requestString) {
-  var requestPort = 8082;
+  var requestPort = 8080;
   var request = new XMLHttpRequest();
   console.log('http://localhost:' + requestPort + '/' + requestString);
   

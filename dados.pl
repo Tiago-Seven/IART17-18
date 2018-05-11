@@ -144,7 +144,7 @@ nome_atributo(estacionamento).
 perguntavel(hotel).
 perguntavel(rating).
 perguntavel(categoria).
-perguntavel(estrelas).
+perguntavel(estrela).
 perguntavel(servico).
  
 preposicao(s-m,do) --> [do].
