@@ -1,27 +1,29 @@
 var me = {};
 me.avatar = "user.png";
-
+let storeToArrowUp = [];
+let index = 0;
 var you = {};
 you.avatar = "bot.png";
-let recognition = new webkitSpeechRecognition();
-recognition.lang = "pt-PT";
-recognition.continuous = true;
-let mic = document.querySelector('.fa-microphone')
-mic.onmousedown = function(){
-  recognition.start();
+let isWebkit = 'webkitSpeechRecognition' in window;
+let speak = new SpeechSynthesisUtterance();
+if (isWebkit){
+  let recognition = new webkitSpeechRecognition();
+  recognition.lang = "pt-PT";
+  recognition.continuous = true;
+  let mic = document.querySelector('.fa-microphone')
+  mic.onmousedown = function(){
+    recognition.start();
+  }
+
+  mic.onmouseup = function() {
+    recognition.stop();
+  }
+
+  recognition.onresult = function (event) {
+    let textInput = document.querySelector(".mytext");
+    textInput.value = event.results[0][0].transcript;  
+  };
 }
-
-mic.onmouseup = function() {
-  recognition.stop();
-}
-
-
-recognition.onresult = function (event) {
-  let textInput = document.querySelector(".mytext");
-  textInput.value = event.results[0][0].transcript;
-  
-   
-};
 
 
 
@@ -75,11 +77,15 @@ function resetChat() {
   $("ul").empty();
 }
 
+
+
 $(".mytext").on("keydown", function (e) {
   if (e.which == 13) {
     var text = $(this).val();
     if (text !== "") {
       insertChat("you", text);
+      storeToArrowUp.unshift(text);
+      index = 0;
       $(this).val('');
       text = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\?]/g, " ");
       text = text.trim();
@@ -88,16 +94,27 @@ $(".mytext").on("keydown", function (e) {
       let message = JSON.stringify(array);
       message = message.replace(/"/g, "");
       response = makeRequest("responde(" + message +")");
-      if(response == "yes")
-        response = "Sim! :)"
-
-      if (response == "no")
-        response = "Não :("
 
       if (response == "syntax_error" || response == "Bad Request")
         response = "Não percebi o que escreveste, verifica se a frase tem algum erro por favor :)"
 
       insertChat("me",response,500);
+      speak.text = response;
+      speak.lang = 'pt-PT';
+      speechSynthesis.speak(speak);
+
+    }
+  }
+  if (e.which == 38) {
+    if(index < storeToArrowUp.length){
+      $(this).val(storeToArrowUp[index]);
+      index++;
+    }
+  }
+  if (e.which == 40) {
+    if (index >= 0) {
+      $(this).val(storeToArrowUp[index]);
+      index--;
     }
   }
 });
@@ -472,7 +489,7 @@ $('body > div > div > div:nth-child(2) > span').click(function () {
 resetChat();
 
 //-- Print Messages
-insertChat("me", "Hello :D", 0);
+insertChat("me", "Ola :D", 0);
 
 
 

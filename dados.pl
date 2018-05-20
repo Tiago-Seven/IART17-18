@@ -265,7 +265,7 @@ verbo_atributo(disponibilizar).
 verbo_atributo(possuir).
 verbo_atributo(ter).
 
-% rating estrelas e categoria
+% Rating Estrelas e Categoria
 verbo_REC(possuir).
 verbo_REC(ter).
 
@@ -280,20 +280,10 @@ determinante(s-f,uma) --> [uma].
 determinante(p-f,umas) --> [umas].
 conjuncao(_-_) --> [e].
 
-% testes semanticos
+
 hotel(Hotel) :-
   hotel(Hotel,_,_,_,_).
 
-possuir(X,"rating") :- hotel(X,_,_,_,_).
-possuir(X,"servicos") :- hotel(X,_,_,_,_).
-possuir(X,"categoria") :- hotel(X,_,_,_,_).
-possuir(X,"quartos") :- hotel(X,_,_,_,_).
-possuir(X,"estrelas") :- hotel(X,_,_,_,_).
-disponibilizar(X,"servicos") :- hotel(X,_,_,_,_).
-com(X,"rating") :- hotel(X,_,_,_,_).
-com(X, "estrelas") :- hotel(X,_,_,_,_).
-com(X, "categoria") :- hotel(X,_,_,_,_).
-com(X, "servicos") :- hotel(X,_,_,_,_).
 local(porto).
 local(lisboa).
 local(coimbra).
@@ -307,34 +297,3 @@ local(albufeira).
 local(braga).
 local(vilamoura).
 local(figueira-da-foz).
-ficar(X, Y) :- hotel(X,_,_,_,_), local(Y).
-ser("restaurante,servico").
-ser("vista de mar,servico").
-ser("wifi,servico").
-ser("piscina,servico").
-ser("baby-sitting,servico").
-ser("piso para fumadores,servico").
-ser("pisos para fumadores,servico").
-ser("estacionamento,servico").
-ser(X, "hotel") :- hotel(X,_,_,_,_).
-ser(X,"numero") :- integer(X).
-comparador("superior").
-comparador("inferior").
-comparador("igual").
-comparavel("estrelas", Y) :- caracteristica(Y).
-comparavel("rating", Y) :- caracteristica(Y).
-ter(X,"rating") :- hotel(X,_,_,_,_).
-ter(X,"servico") :- hotel(X,_,_,_,_).
-ter(X, Y) :- hotel(X,_,_,_,_), ser(Y,"servico").
-
-/*rating(Hotel,Rating,igual) :-  ser(rating,inteiro), ser(Hotel,hotel), hotel(X,_,Rating,_,_,_).
-rating(Hotel,Rating,maior) :- ser(rating,inteiro), ser(Hotel,hotel), hotel(Hotel,_,RatingDB,_,_,_),RatingDB > Rating.
-rating(Hotel,Rating,menor) :- ser(rating,inteiro), ser(Hotel,hotel), hotel(Hotel,_,RatingDB,_,_,_),RatingDB < Rating.
-estrelas(Hotel,Estrelas,igual)  :- ser(estrelas,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,Estrelas,_).
-estrelas(Hotel,Estrelas,maior) :- ser(estrelas,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,EstrelasDB,_),EstrelasDB > Estrelas.
-estrelas(Hotel,Estrelas,menor) :- ser(estrelas,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,EstrelasDB,_),EstrelasDB < Estrelas.
-custo(Hotel,Custo,igual) :- ser(custo,inteiro), ser(Hotel,hotel), hotel(X,_,_,Custo,_,_).
-custo(Hotel,Custo,maior) :- ser(custo,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,CustoDB,_),CustoDB > Custo.
-custo(Hotel,Custo,menor) :- ser(custo,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,CustoDB,_),CustoDB < Custo.
-servico(Hotel,Servico) :- ser(Hotel,hotel), hotel(Hotel,_,_,_,_,Servicos), member(Servico,Servicos).
-local(Hotel,Local) :- ser(Hotel,hotel), hotel(Hotel,Local,_,_,_,_).*/

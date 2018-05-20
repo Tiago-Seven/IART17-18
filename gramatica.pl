@@ -1,279 +1,317 @@
-% base de dados
+:- consult('dados.pl').
 
-%hotel(Nome,Local,Rating,Estrela,Servicos)
-hotel("Hotel Borges Chiado,Lisboa",6.8,3,[[wifi]]).
-hotel("Turim Terreiro Do Paco,Lisboa",8.7,1,[[]]).
-hotel("TRYP Colina do Castelo,Castelo Branco",8.4,4,[[restaurante]]).
-hotel("Pedras do Mar Resort and Spa,Ponta Delgada",8.6,5,[[piscina]]).
-hotel("Santa Cruz,Coimbra",7.0,1,[[piscina]]).
-hotel("Hotel Do Mar,Sesimbra",7.8,4,[[wifi]]).
-hotel("Yellow Praia Monte Gordo,Monte Gordo",4.7,4,[[piscina],[pisos ,para ,fumadores]]).
-hotel("TRYP Lisboa Caparica Mar,Costa da Caparica",7.2,4,[[wifi]]).
-hotel("Alfamar Beach and Sport Resort,Albufeira",7.2,4,[[wifi]]).
-hotel("Melia Braga Hotel,Braga",3.4,4,[[]]).
-hotel("The Lince Azores Great Hotel,Ponta Delgada",7.9,4,[[piscina]]).
-hotel("Crowne Plaza Vilamoura,Vilamoura",8.5,5,[[wifi],[piscina]]).
-hotel("Marques de Pombal,Lisboa",4.5,4,[[wifi]]).
-hotel("Eurostars Porto Douro,Porto",8.7,4,[[baby-sitting],[restaurante],[estacionamento]]).
-hotel("Eurostars Oasis Plaza,Figueira da Foz",8.8,4,[[wifi],[piscina],[pisos,para,fumadores],[restaurante],[baby-sitting],[estacionamento],[vista, de, mar]]).
-% Sujeito,Acao,Local,Rating,ComparadorRating,Estrelas,ComparadorEstrelas,ArrayServicos,
-frase --> frase_declarativa(_-_,).
-frase --> frase_interrogativa(_-_).
-frase --> frase_conjuntiva(_-_).
-frase_interrogativa(X-Y) --> forma_frase_interrogativa(X-Y).
-frase_interrogativa(X-Y) --> forma_frase_interrogativa(X-Y), uma_ou_mais_conjucoes(_-_).
-forma_frase_interrogativa(X-Y) --> pronome(X-Y), sintagma_verbal_interrogativo(X-Y), sintagma_nominal_interrogativo(_-_).
-forma_frase_interrogativa(X-Y) --> pronome(X-Y), (nome(X-Y);(nome(X-Y),comparacao(X-Y))), sintagma_verbal_interrogativo(_-_).
-forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y), nome(X-Y), adjetivo(X-Y), pronome(X-Y), sintagma_verbal(X-Y).
-forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y),nome(X-Y), pronome(X-Y), sintagma_verbal(X-Y).
-forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y), nome(X-Y), preposicao(Z-P), nome(Z-P), pronome(X-Y), sintagma_verbal(X-Y).
-forma_frase_interrogativa(X-Y) --> pronome(X-Y), quantificador(X-Y), nome(X-Y), preposicao(Z-P), nome(Z-P), comparacao(_-_).
-frase_declarativa(X-Y) --> sintagma_nominal(X-Y), sintagma_verbal(X-Y), uma_ou_mais_conjucoes(_-_).
-frase_declarativa(X-Y) --> sintagma_nominal(X-Y), sintagma_verbal(X-Y).
-frase_conjuntiva(X-Y) --> conjuncao(X-Y), sintagma_nominal_preposicional(X-Y).
-sintagma_nominal(s-m) --> [o],[hotel],adjetivo(s-m),nome(s-m).
-sintagma_nominal(X-Y) --> (quantificador(X-Y),nome(X-Y), adjetivo(X-Y)).
-sintagma_nominal(X-Y) --> (quantificador(X-Y),numero(Z-P),nome(Z-P));(quantificador(X-Y),numero(_-_)).
-sintagma_nominal(X-Y) --> (quantificador(X-Y),nome(X-Y)).
-sintagma_nominal(X-Y) --> sintagma_nominal_preposicional(X-Y).
-sintagma_nominal(X-Y) --> nome(X-Y);(nome(X-Y),comparacao(X-Y));(numero(X-Y),nome(X-Y)).
-sintagma_nominal(X-Y) --> nome_com_preposicao(X-Y).
-nome_com_preposicao(X-Y) --> nome(X-Y), preposicao(Z-P), nome(Z-P).
-nome_com_preposicao(X-Y) --> nome(X-Y), preposicao(Z-P), nome_com_preposicao(Z-P).
-sintagma_nominal_preposicional(X-Y) --> (preposicao(X-Y), nome(X-Y)) ; (preposicao(X-Y),numero(Z-P),nome(Z-P)) ; (preposicao(Z-P), nome(Z-P), comparacao(Z-P)).
-sintagma_nominal_interrogativo(X-Y) --> sintagma_nominal_preposicional(X-Y).
-sintagma_nominal_interrogativo(X-Y) --> sintagma_nominal_preposicional(X-Y), sintagma_nominal_interrogativo(_-_).
-comparacao(X-Y) --> comparador(X-Y),sintagma_nominal(X-Y).
-sintagma_verbal(X-Y) --> verbo(X-Y), sintagma_nominal(_-_).
-sintagma_verbal(X-Y) --> verbo(X-Y), nome(_-_), uma_ou_mais_conjucoes(_-_).
-sintagma_verbal_interrogativo(X-Y) --> verbo(X-Y), sintagma_nominal(X-Y).
-uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_nominal(X-Y).
-uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_nominal(X-Y), uma_ou_mais_conjucoes(_-_).
-uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_verbal(X-Y).
-uma_ou_mais_conjucoes(X-Y) --> conjuncao(X-Y), sintagma_verbal(X-Y), uma_ou_mais_conjucoes(X-Y).
+frase(_,Output,Resposta) --> frase_conjuntiva(Output),nothing,{!,tipo_questao(Q),responde_c(Output,Q,Resposta)}.
+frase(S,Output,Resposta) --> {remove_modificados},frase_interrogativa(Q,S,Output),nothing,{!,assert(tipo_questao(Q)),assert(sujeito_questao(S)),responde_i(Output,S,Q,Resposta)}.
+frase(S,Output,Resposta) --> {remove_modificados},frase_declarativa(S,Output),nothing,
+  {!,verifica_output(Output),insere_restricoes(Output),assert(nome_hotel(S)),assert(tipo_questao(d)),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(')}.
 
-verifica_sintaxe(X) :-frase(X,[]).
+responde_c(Array,d,Resposta) :-
+  verifica_output(Array),retira_duplicado(Array),insere_restricoes(Array),
+  findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,Resposta='Sim! :)',Resposta='Nao :(').
 
-stringToAtom([],Aux,Aux).
-stringToAtom([X|Resto],Aux,Fim):-name(Atom, X),stringToAtom(Resto,[Atom|Aux],Fim).
+responde_c(Array,Q,Resposta) :-
+    retira_duplicado(Array),sujeito_questao(S),responde_i(Array,S,Q,Resposta).
 
-testes_interrogativas:-
-verifica_sintaxe([quais,sao,os,hoteis,de,categoria,superior,a,3,estrelas,em,lisboa]),
-\+verifica_sintaxe([quais,sao,as,hoteis,de,categoria,superior,a,3,estrelas,em,lisboa]),
-verifica_sintaxe([e,em,coimbra]),
-verifica_sintaxe([que,servicos,disponibiliza,o,hotel,eurostars,porto,douro]),
-\+verifica_sintaxe([que,servicos,disponibilizam,o,hotel,eurostars,porto,douro]),
-verifica_sintaxe([quais,servicos,disponibiliza,o,hotel,eurostars,porto,douro]),
-verifica_sintaxe([quais,os,hoteis,parisienses,que,possuem,servico,de,babysitting]),
-verifica_sintaxe([quais,os,hoteis,que,possuem,servico,de,babysitting]),
-\+verifica_sintaxe([quais,os,parisienses,que,possuem,servico,de,babysitting]),
-verifica_sintaxe([quais,os,hoteis,de,faro,que,possuem,categoria,inferior,a,4,e,quartos,com,vista,de,mar]),
-verifica_sintaxe([quantos,hoteis,tem,wifi,e,babysitting,e,piscina]),
-\+verifica_sintaxe([quanta,hoteis,tem,wifi,e,babysitting,e,piscina]),
-verifica_sintaxe([e,com,wifi]),
-verifica_sintaxe([quais,os,hoteis,com,rating,inferior,a,8]),
-\+verifica_sintaxe([qual,os,hoteis,com,rating,inferior,a,8]),
-verifica_sintaxe([quantos,sao,os,hoteis,do,porto]).
+retira_duplicado([]).
+retira_duplicado([lugar-Lugar|R]):-
+  if_then(lugar(_),(retractall(lugar(_)),assert(lugar(Lugar)))),
+  retira_duplicado(R).
 
-testes_declarativas :-
-verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,4,estrelas]),
-\+verifica_sintaxe([a,hotel,eurostars,porto,douro,fica,em,faro,e,possui,4,estrelas]),
-\+verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,1,estrelas]),
-verifica_sintaxe([o,hotel,the,lince,azores,great,hotel,e,em,ponta,delgada]),
-verifica_sintaxe([o,yellow,praia,monte,gordo,tem,wifi,e,fica,em,monte,gordo]),
-verifica_sintaxe([o,hotel,portugues,eurostars,oasis,plaza,tem,piscina,e,quartos,com,wifi]).
+retira_duplicado([rating-Comparador-Valor|R]):-
+  if_then(lugar(_),(retractall(rating(_,_)),assert(rating(Comparador,Valor)))),
+  retira_duplicado(R).
 
-nome(s-m) --> [hotel].
-nome(p-m) --> [hoteis].
-nome(s-m) --> [porto].
-nome(s-f) --> [lisboa].
-nome(s-f) --> [coimbra].
-nome(s-m) --> [faro].
-nome(s-m) --> [castelo,branco].
-nome(s-f) --> [ponta,delgada].
-nome(s-f) --> [sesimbra].
-nome(s-m) --> [monte,gordo].
-nome(s-f) --> [costa,da,caparica].
-nome(s-f) --> [albufeira].
-nome(s-f) --> [braga].
-nome(s-f) --> [vilamoura].
-nome(s-f) --> [figueira,da,foz].
-nome(s-f) --> [categoria].
-nome(s-f) --> [estrela].
-nome(p-f) --> [estrelas].
-nome(s-m) --> [servico].
-nome(p-m) --> [servicos].
-nome(s-m) --> [quarto].
-nome(p-m) --> [quartos].
-nome(s-f) --> [vista].
-nome(s-m) --> [mar].
-nome(s-_) --> [wifi].
-nome(s-f) --> [piscina].
-nome(p-f) --> [piscinas].
-nome(s-m) --> [baby-sitting].
-nome(s-m) --> [babysitting].
-nome(s-m) --> [restaurante].
-nome(s-m) --> [piso].
-nome(p-m) --> [pisos].
-nome(p-m) --> [fumadores].
-nome(s-m) --> [estacionamento].
-nome(s-f) --> [noite].
-nome(p-f) --> [noites].
-nome(s-m) --> [rating].
-nome(s-m) --> [hotel,borges,chiado].
-nome(s-m) --> [turim,terreiro,do,paco].
-nome(s-m) --> [tryp,colina,do,castelo].
-nome(s-m) --> [pedras,do,mar,resort,and,spa].
-nome(s-m) --> [santa,cruz].
-nome(s-m) --> [hotel,do,mar].
-nome(s-m) --> [yellow,praia,monte,gordo].
-nome(s-m) --> [tryp,lisboa,caparica,mar].
-nome(s-m) --> [alfamar,beach,and,sport,resort].
-nome(s-m) --> [melia,braga,hotel].
-nome(s-m) --> [the,lince,azores,great,hotel].
-nome(s-m) --> [crowne,plaza,vilamoura].
-nome(s-m) --> [marques,de,pombal].
-nome(s-m) --> [eurostars,porto,douro].
-nome(s-m) --> [eurostars,oasis,plaza].
-nome(s-m) --> [hotel,turim,terreiro,do,paco].
-nome(s-m) --> [hotel,tryp,colina,do,castelo].
-nome(s-m) --> [hotel,pedras,do,mar,resort,and,spa].
-nome(s-m) --> [hotel,santa,cruz].
-nome(s-m) --> [hotel,hotel,do,mar].
-nome(s-m) --> [hotel,yellow,praia,monte,gordo].
-nome(s-m) --> [hotel,tryp,lisboa,caparica,mar].
-nome(s-m) --> [hotel,alfamar,beach,and,sport,resort].
-nome(s-m) --> [hotel,melia,braga,hotel].
-nome(s-m) --> [hotel,the,lince,azores,great,hotel].
-nome(s-m) --> [hotel,crowne,plaza,vilamoura].
-nome(s-m) --> [hotel,marques,de,pombal].
-nome(s-m) --> [hotel,eurostars,porto,douro].
-nome(s-m) --> [hotel,eurostars,oasis,plaza].
-nome(s-f) --> [manel].
-nome(s-f) --> [estadia].
+retira_duplicado([estrelas-Comparador-Valor|R]):-
+  if_then(lugar(_),(retractall(estrelas(_,_)),assert(estrelas(Comparador,Valor)))),
+  retira_duplicado(R).
 
-digito(s-_) --> [1].
-digito(p-_) --> [2].
-digito(p-_) --> [3].
-digito(p-_) --> [4].
-digito(p-_) --> [5].
-digito(p-_) --> [6].
-digito(p-_) --> [7].
-digito(p-_) --> [8].
-digito(p-_) --> [9].
-digito(p-_) --> [0].
-numero_extenso(s-m) --> [um].
-numero_extenso(s-f) --> [uma].
-numero_extenso(p-m) --> [dois].
-numero_extenso(p-f) --> [duas].
-numero_extenso(p-_) --> [tres].
-numero_extenso(p-_) --> [quatro].
-numero_extenso(p-_) --> [cinco].
-numero(X-Y) --> numero_extenso(X-Y);digito(X-Y).
+retira_duplicado([hotel-Hotel|R]):-
+  if_then(nome_hotel(_),(retractall(nome_hotel(_)),assert(nome_hotel(Hotel)))),
+  retira_duplicado(R).
 
-comparador(s-_) --> [superior].
-comparador(p-_) --> [superiores].
-comparador(s-_) --> [inferior].
-comparador(p-_) --> [inferiores].
-comparador(s-_) --> [igual].
-comparador(p-_) --> [iguais].
+retira_duplicado([_|R]):-
+  retira_duplicado(R).
 
-adjetivo(s-_) --> [parisiense].
-adjetivo(p-_) --> [parisienses].
-adjetivo(s-_) --> [portugues].
-adjetivo(p-_) --> [portugueses].
+responde_i(Array,hotel,Q,Resposta) :-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),length(Hoteis,N),if_then_else(N>=1,resposta_tipo_hotel(Hoteis,Q,Resposta),(Resposta='Nao temos resultados para a sua questao :(')).
+responde_i(Array,rating,_,Resposta) :-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  nth0(0,Hoteis,Hotel),
+  hotel(Hotel,_,Rating,_,_),
+  number_chars(Rating, Chars),
+  atom_chars(T, Chars),
+  atom_concat('O hotel tem o rating de: ',T,Resposta).
 
-pronome(p-m) --> [quantos].
-pronome(s-m) --> [quanto].
-pronome(p-f) --> [quantas].
-pronome(s-f) --> [quanta].
-pronome(p-_) --> [quais].
-pronome(s-_) --> [qual].
-pronome(_-_) --> [que].
-verbo(s-_) --> [e].
-verbo(p-_) --> [sao].
-verbo(s-_) --> [disponibiliza].
-verbo(p-_) --> [disponibilizam].
-verbo(s-_) --> [possui].
-verbo(p-_) --> [possuem].
-verbo(s-_) --> [fica].
-verbo(p-_) --> [ficam].
-verbo(s-_) --> [tem].
-verbo(p-_) --> [tem].
-quantificador(s-m) --> [o].
-quantificador(p-m) --> [os].
-quantificador(p-f) --> [as].
-quantificador(s-f) --> [a].
-quantificador(s-m) --> [um].
-quantificador(p-m) --> [uns].
-quantificador(s-f) --> [uma].
-quantificador(p-f) --> [umas].
-preposicao(s-m) --> [do].
-preposicao(p-m) --> [dos].
-preposicao(p-f) --> [das].
-preposicao(s-f) --> [da].
-preposicao(s-m) --> [no].
-preposicao(p-m) --> [nos].
-preposicao(s-f) --> [na].
-preposicao(p-f) --> [nas].
-preposicao(_-_) --> [de].
-preposicao(_-_) --> [em].
-preposicao(_-_) --> [com].
-preposicao(_-_) --> [para].
-conjuncao(_-_) --> [e].
+responde_i(Array,estrela,_,Resposta) :-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  nth0(0,Hoteis,Hotel),
+  hotel(Hotel,_,_,Estrelas,_),
+  number_chars(Estrelas, Chars),
+  atom_chars(T, Chars),
+  atom_concat('O hotel tem ',T,Aux),
+  if_then_else(Estrelas > 1, atom_concat(Aux,' estrelas ',Resposta),atom_concat(Aux,' estrela ',Resposta)).
 
-% testes semanticos
-possuir(X,"rating") :- hotel(X,_,_,_,_).
-possuir(X,"servicos") :- hotel(X,_,_,_,_).
-possuir(X,"categoria") :- hotel(X,_,_,_,_).
-possuir(X,"quartos") :- hotel(X,_,_,_,_).
-possuir(X,"estrelas") :- hotel(X,_,_,_,_).
-disponibilizar(X,"servicos") :- hotel(X,_,_,_,_).
-com(X,"rating") :- hotel(X,_,_,_,_).
-com(X, "estrelas") :- hotel(X,_,_,_,_).
-com(X, "categoria") :- hotel(X,_,_,_,_).
-com(X, "servicos") :- hotel(X,_,_,_,_).
-local("Porto").
-local("Lisboa").
-local("Coimbra").
-local("Faro").
-local("Castelo Branco").
-local("Ponta Delgada").
-local("Sesimbra").
-local("Monte Gordo").
-local("Costa da Caparica").
-local("Albufeira").
-local("Braga").
-local("Vilamoura").
-local("Figueira da Foz").
-ficar(X, Y) :- hotel(X,_,_,_,_), local(Y).
-ser("restaurante,servico").
-ser("vista de mar,servico").
-ser("wifi,servico").
-ser("piscina,servico").
-ser("baby-sitting,servico").
-ser("piso para fumadores,servico").
-ser("pisos para fumadores,servico").
-ser("estacionamento,servico").
-ser(X, "hotel") :- hotel(X,_,_,_,_).
-ser(X,"numero") :- integer(X).
-comparador("superior").
-comparador("inferior").
-comparador("igual").
-comparavel("estrelas", Y) :- caracteristica(Y).
-comparavel("rating", Y) :- caracteristica(Y).
-ter(X,"rating") :- hotel(X,_,_,_,_).
-ter(X,"servico") :- hotel(X,_,_,_,_).
-ter(X, Y) :- hotel(X,_,_,_,_), ser(Y,"servico").
+responde_i(Array,servico,Q,Resposta):-
+  verifica_output(Array),insere_restricoes(Array),findall(Nome,responde(Nome),Hoteis),
+  nth0(0,Hoteis,Hotel),
+  hotel(Hotel,_,_,_,Servicos),
+  resposta_tipo_servicos(Servicos,Q,Resposta).
 
-/*rating(Hotel,Rating,igual) :-  ser(rating,inteiro), ser(Hotel,hotel), hotel(X,_,Rating,_,_,_).
-rating(Hotel,Rating,maior) :- ser(rating,inteiro), ser(Hotel,hotel), hotel(Hotel,_,RatingDB,_,_,_),RatingDB > Rating.
-rating(Hotel,Rating,menor) :- ser(rating,inteiro), ser(Hotel,hotel), hotel(Hotel,_,RatingDB,_,_,_),RatingDB < Rating.
-estrelas(Hotel,Estrelas,igual)  :- ser(estrelas,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,Estrelas,_).
-estrelas(Hotel,Estrelas,maior) :- ser(estrelas,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,EstrelasDB,_),EstrelasDB > Estrelas.
-estrelas(Hotel,Estrelas,menor) :- ser(estrelas,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,EstrelasDB,_),EstrelasDB < Estrelas.
-custo(Hotel,Custo,igual) :- ser(custo,inteiro), ser(Hotel,hotel), hotel(X,_,_,Custo,_,_).
-custo(Hotel,Custo,maior) :- ser(custo,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,CustoDB,_),CustoDB > Custo.
-custo(Hotel,Custo,menor) :- ser(custo,inteiro), ser(Hotel,hotel), hotel(Hotel,_,_,_,CustoDB,_),CustoDB < Custo.
-servico(Hotel,Servico) :- ser(Hotel,hotel), hotel(Hotel,_,_,_,_,Servicos), member(Servico,Servicos).
-local(Hotel,Local) :- ser(Hotel,hotel), hotel(Hotel,Local,_,_,_,_).*/
+resposta_tipo_servicos(Servicos,qt,Resposta):-
+  length(Servicos,Tamanho),
+  number_chars(Tamanho, Chars),
+  atom_chars(T, Chars),
+  atom_concat('O hotel tem ',T,RAux),
+  if_then_else(Tamanho > 1, atom_concat(RAux,' servicos ',Resposta),atom_concat(RAux,' servico ',Resposta)).
+
+resposta_tipo_servicos(Servicos,ql,Resposta):-
+  percorre_servicos(Servicos,[],RespostaAux),
+  length(Servicos,Tamanho),
+  if_then_else(Tamanho<1,Resposta='O hotel nao tem servicos',(
+  array_para_string(RespostaAux,' ',RespostaAux2),
+  if_then_else(Tamanho > 1,atom_concat('Encontrei os seguintes servicos: ',RespostaAux2,Resposta),
+    atom_concat('Encontrei o seguinte servico: ',RespostaAux2,Resposta))
+  )).
+
+percorre_servicos([],Resposta,Resposta).
+percorre_servicos([S|Resto],RespostaAux,Resposta):-
+  converte_servico_nome(S,Nome),
+  percorre_servicos(Resto,[Nome|RespostaAux],Resposta).
+
+
+resposta_tipo_hotel(Hoteis,qt,Resposta):-
+  length(Hoteis,Tamanho),
+  number_chars(Tamanho, Chars),
+  atom_chars(T, Chars),
+  atom_concat('Encontrei ',T,RAux),
+  if_then_else(Tamanho > 1, atom_concat(RAux,' hoteis ',Resposta),atom_concat(RAux,' hotel ',Resposta)).
+
+resposta_tipo_hotel(Hoteis,ql,Resposta):-
+  percorre_hoteis(Hoteis,[],RespostaAux),
+  length(Hoteis,Tamanho),
+  array_para_string(RespostaAux,' ',RespostaAux2),
+  if_then_else(Tamanho > 1,atom_concat('Encontrei os seguintes hoteis: ',RespostaAux2,Resposta),
+    atom_concat('Encontrei o seguinte hotel: ',RespostaAux2,Resposta)).
+
+array_para_string([H],Aux,Resposta):-
+  atom_concat(H,Aux,Resposta).
+
+array_para_string([H|Resto],Aux,Resposta):-
+  atom_concat(Aux,' , ',Aux2),
+  atom_concat(Aux2,H,Final),
+  array_para_string(Resto,Final,Resposta).
+
+
+
+percorre_hoteis([],Resposta,Resposta).
+percorre_hoteis([H|Resto],RespostaAux,Resposta):-
+  converte_hotel_nome(H,Nome),
+  percorre_hoteis(Resto,[Nome|RespostaAux],Resposta).
+
+responde(Nome) :-
+  hotel(Nome,Lugar,Rating,Estrelas,Atributos),
+  once((if_then(nome_hotel(_),nome_hotel(Nome)),
+  if_then(lugar(_),lugar(Lugar)),
+  if_then(rating(_,_),(rating(Comparador,Valor),restringe_valor(Rating,Comparador,Valor))),
+  if_then(estrelas(_,_),(estrelas(Comparador,Valor),restringe_valor(Estrelas,Comparador,Valor))),
+  if_then(atributo(_),restringe_atributos(Atributos)))).  
+
+restringe_atributos(Atributos) :-
+  findall(A,atributo(A),L),
+  verifica_atributos(L,Atributos).
+
+verifica_atributos([],_).
+verifica_atributos([Elem|R],B):-
+  member(Elem,B),
+  verifica_atributos(R,B).
+
+
+restringe_valor(Variavel,maior,Valor) :-
+  Variavel > Valor.
+
+restringe_valor(Variavel,menor,Valor) :-
+  Variavel < Valor.
+
+restringe_valor(Variavel,igual,Variavel).
+
+verifica_output(Array) :-
+  findall(_,(member(lugar-_,Array)),Lugares),
+  findall(_,(member(estrelas-_-_,Array)),Estrelas),
+  findall(_,(member(rating-_-_,Array)),Rating),
+  length(Lugares,NLugares),
+  length(Estrelas,NEstrelas),
+  length(Rating,NRating),
+  NLugares =< 1,
+  NEstrelas =< 1,
+  NRating =< 1.
+
+insere_restricoes([]).
+insere_restricoes([lugar-Lugar|R]) :-
+  assert(lugar(Lugar)),
+  insere_restricoes(R).
+
+insere_restricoes([atributo-Atributo|R]) :-
+  assert(atributo(Atributo)),
+  insere_restricoes(R).
+
+insere_restricoes([hotel-Hotel|R]) :-
+  assert(nome_hotel(Hotel)),
+  insere_restricoes(R).
+
+insere_restricoes([estrelas-Comparador-Estrelas|R]) :-
+  assert(estrelas(Comparador,Estrelas)),
+  insere_restricoes(R).
+
+insere_restricoes([rating-Comparador-Rating|R]) :-
+  assert(rating(Comparador,Rating)),
+  insere_restricoes(R).
+
+
+frase_declarativa(S,OutputSV) --> sn(N,S,[],OutputSN), sv(N,S,OutputSN,OutputSV).
+frase_declarativa(S,OutputUOMC) --> sn(N,S,[],OutputSN), sv(N,S,OutputSN,OutputSV), um_ou_mais_conjuncoes(N,S,OutputSV,OutputUOMC).
+
+% sintagma nominal
+ %sem "com"  
+sn(N,S,Input,Output) --> determinante(N-G,_),sujeito(N-G,S,Input,Output).
+
+sujeito(N-G,S,_,_) --> nome(N-G,S,_).
+ %com "com"  
+sujeito(N-G,S,Input,Output) --> nome(N-G,S,_),s_n_preposicional(N-G,Input,Output,d).
+
+s_n_preposicional(X-Y,Input,Output,Tipo) --> (preposicao(X-Y,Prep), nome(X-Y,Atr,Prep),{nome_atributo(Atr),once(append(Input,[atributo-Atr],Output))}) ;
+  (preposicao(X-Y,Prep),numero(Z-P,N),nome(Z-P,estrela,Prep),{once(append(Input,[estrelas-igual-N],Output)),!}) ; 
+  (preposicao(Z-P,Prep), comparacao(Z-P,Prep,Input,Output));
+  (preposicao(Z-P,Prep), adv_quantidade(Z-P,Comparador),numero(Z-P,N),nome(Z-P,estrela,Prep),{once(append(Input,[estrelas-Comparador-N],Output)),!});
+  (demonstrativo(Z-P,Prep), nome(Z-P,Lugar,Prep),{nome_lugar(Lugar),once(append(Input,[lugar-Lugar],Output))});
+  ({Tipo=i},preposicao(Z-P,Prep),nome(Z-P,Lugar,Prep),{nome_lugar(Lugar),once(append(Input,[lugar-Lugar],Output))});
+  ({Tipo=i},preposicao(Z-P,Prep),nome(Z-P,Hotel,Prep),{hotel(Hotel),once(append(Input,[hotel-Hotel],Output))}).
+%  (demonstrativo(Z-P,Dem),nome(N1-G1,Lugar,_),{nome_lugar(Lugar),demonstrativo_nome(Dem,Lugar)})
+
+comparacao(_-_,Prep,Input,Output) --> nome(Z-P,categoria,Prep), comparador(Z-P,Comparador),determinante(_-_,a),numero(X-Y,Valor),nome(X-Y,estrela,Prep),{once(append(Input,[estrelas-Comparador-Valor],Output)),!}.
+comparacao(_-_,Prep,Input,Output) --> nome(Z-P,categoria,Prep), comparador(Z-P,Comparador),determinante(_-_,a),numero(_-_,Valor),{once(append(Input,[estrelas-Comparador-Valor],Output))}.
+comparacao(_-_,Prep,Input,Output) --> nome(Z-P,rating,Prep), comparador(Z-P,Comparador),determinante(_-_,a),numero(_-_,Valor),{once(append(Input,[rating-Comparador-Valor],Output))}.
+
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_lugar(Verbo)}, {!}, preposicao(N1-G1,Prep),
+  {preposicao_lugar(Prep)},nome(N1-G1,Lugar,Prep),{nome_lugar(Lugar)},{once(append(Input,[lugar-Lugar],Output))}.
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_REC(Verbo)},comparacao(_-_,_,Input,Output).
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_REC(Verbo)},numero(Z-P,Valor),nome(Z-P,estrela,_),{once(append(Input,[estrelas-igual-Valor],Output))}.
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],Output))}.
+sv(N,S,Input,Output) --> verbo(N,Verbo,S,d), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],OutputAtr))},um_ou_mais_atributos(_-_,OutputAtr,Output).
+
+um_ou_mais_conjuncoes(N,S,Input,Output) --> conjuncao(N-S), sv(N,S,Input,Output).
+um_ou_mais_conjuncoes(N,S,Input,Output) --> conjuncao(N-S), sv(N,S,Input,OutputSV),um_ou_mais_conjuncoes(N,S,OutputSV,Output).
+
+um_ou_mais_atributos(_-_,Input,Output) --> conjuncao(X-Y),nome(X-Y,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],Output))}.
+um_ou_mais_atributos(_-_,Input,Output) --> conjuncao(X-Y),nome(X-Y,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],OutputAtr))},um_ou_mais_atributos(_-_,OutputAtr,Output).
+
+
+
+frase_interrogativa(Q,S,Output) --> si(_,Q,S,Output), {perguntavel(S)}.
+frase_interrogativa(Q,S,Output) --> si(_,Q,S,OutputSI), {perguntavel(S)}, svi(_,S,OutputSI,Output).
+frase_interrogativa(Q,S,Output) --> si(_,Q,S,OutputSI), {perguntavel(S)}, svi(_,S,OutputSI,OutputSVI), um_ou_mais_conjuncoes_i(_,S,OutputSVI,Output).
+
+si(N,Q,S,Output) --> pronome_i(N-G,Pronome), {pronome_i2tipo(Pronome,Q)} , sni(N-G,S,Output).
+si(N,Q,_,_) --> pronome_i(N-_,Pronome), {pronome_i2tipo(Pronome,Q)}.
+si(N,Q,S,Output) --> pronome_i(N-G,Pronome), {pronome_i2tipo(Pronome,Q)} ,verbo(N,ser,S,i), {Pronome \= que}, sni(N-G,S,Output).
+si(N,Q,S,_) --> pronome_i(N-_,Pronome), {pronome_i2tipo(Pronome,Q)},verbo(N,ser,S,i),{Pronome \= que}.
+
+sni(N-G,S,Output) --> determinante(N-G,_),nome_composto(N-G,S,Output),[que] ,\+ nothing.
+sni(N-G,S,Output) --> determinante(N-G,_),nome_composto(N-G,S,Output), nothing.
+sni(N-G,S,Output) --> nome_composto(N-G,S,Output).
+
+nome_composto(N-G,S,_) --> nome(N-G,S,_).
+nome_composto(N-G,S,Output) --> nome(N-G,S,_),um_ou_mais_s_n_preposicional(_-_,[],Output).
+
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_lugar(Verbo)}, {!}, preposicao(N1-G1,Prep),
+  {preposicao_lugar(Prep)},nome(N1-G1,Lugar,Prep),{nome_lugar(Lugar)},{once(append(Input,[lugar-Lugar],Output))}.
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_REC(Verbo)},comparacao(_-_,_,Input,Output).
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_REC(Verbo)},numero(Z-P,Valor),nome(Z-P,estrela,_),{once(append(Input,[estrelas-igual-Valor],Output))}.
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_REC(Verbo)}, determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append(Input,[hotel-Hotel],Output))}.
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_REC(Verbo)}, determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append(Input,[hotel-Hotel],OutputHotel))},um_ou_mais_s_n_preposicional(_-_,OutputHotel,Output).
+svi(_,S,Input,Output) --> verbo(_,Verbo,S,i), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],Output))}.
+svi(_,S,Input,Output) --> verbo(_,Verbo,S,i), {verbo_atributo(Verbo)},nome(_-_,Atr,_),{nome_atributo(Atr)},{once(append(Input,[atributo-Atr],OutputAtr))},um_ou_mais_atributos(_-_,OutputAtr,Output).
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_atributo(Verbo),sujeito_atributo(S)},determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append(Input,[hotel-Hotel],Output))}.
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_atributo(Verbo),sujeito_atributo(S)},determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append(Input,[hotel-Hotel],OutputHotel))},um_ou_mais_s_n_preposicional(_-_,OutputHotel,Output).
+svi(N,S,Input,Output) --> verbo(N,Verbo,S,i), {verbo_REC(Verbo)},adv_quantidade(Z-P,Comparador),numero(Z-P,Valor),nome(Z-P,estrela,_),{once(append(Input,[estrelas-Comparador-Valor],Output))}.
+svi(N,S,A,A) --> verbo(N,existir,S,i).
+svi(N,S,Input,Output) --> verbo(N,existir,S,i),preposicao(N1-G1,Prep),
+  {preposicao_lugar(Prep)},nome(N1-G1,Lugar,Prep),{nome_lugar(Lugar)},{once(append(Input,[lugar-Lugar],Output))}.
+svi(N,S,Input,Output) --> verbo(N,existir,S,i),preposicao(N1-G1,Prep),
+  {preposicao_lugar(Prep)},nome(N1-G1,Lugar,Prep),{nome_lugar(Lugar)},{once(append(Input,[lugar-Lugar],OutputLugar))},um_ou_mais_s_n_preposicional(_-_,OutputLugar,Output).
+svi(N,S,Input,Output) --> verbo(N,existir,S,i),um_ou_mais_s_n_preposicional(_-_,Input,Output).
+
+
+um_ou_mais_s_n_preposicional(_-_,Input,Output) --> s_n_preposicional(_-_,Input,Output,i).
+um_ou_mais_s_n_preposicional(_-_,Input,Output) --> s_n_preposicional(_-_,Input,Output1,i),um_ou_mais_s_n_preposicional(_-_,Output1,Output).
+
+um_ou_mais_conjuncoes_i(N,S,Input,Output) --> conjuncao(N-S), svi(N,S,Input,Output).
+um_ou_mais_conjuncoes_i(N,S,Input,Output) --> conjuncao(N-S), svi(N,S,Input,OutputSV),um_ou_mais_conjuncoes_i(N,S,OutputSV,Output).
+
+frase_conjuntiva(Output) --> conjuncao(_-_),um_ou_mais_s_n_preposicional(_-_,[],Output).
+frase_conjuntiva(Output) --> conjuncao(_-_),determinante(N-Y,_),nome(N-Y,Hotel,_),{hotel(Hotel),once(append([],[hotel-Hotel],Output))}.
+frase_conjuntiva([]) --> conjuncao(_-_),pronome_i(N-G,Pronome), {pronome_i2tipo(Pronome,Q)},nome(N-G,Perguntavel,_),{perguntavel(Perguntavel),retractall(tipo_questao(_)),assert(tipo_questao(Q)),retractall(sujeito_questao(_)),assert(sujeito_questao(Perguntavel))}.
+frase_conjuntiva([]) --> conjuncao(_-_),pronome_i(N-G,Pronome), {pronome_i2tipo(Pronome,Q)},nome(N-G,Perguntavel,_),verbo(_,Verbo,Perguntavel,i),{verbo_atributo(Verbo),perguntavel(Perguntavel),retractall(tipo_questao(_)),assert(tipo_questao(Q)),retractall(sujeito_questao(_)),assert(sujeito_questao(Perguntavel))}.
+% nothing --> [].
+
+remove_modificados:-
+  retractall(lugar(_)),retractall(rating(_,_)),retractall(estrelas(_,_)),
+  retractall(atributo(_)),retractall(nome_hotel(_)),retractall(tipo_questao(_)),retractall(sujeito_questao(_)).
+
+
+
+verifica_sintaxe(X) :-frase(_,_,_,X,[]).
+
+t_nova_gramat_i:-
+  verifica_sintaxe([quais,sao,os,hoteis,do,porto]),
+  verifica_sintaxe([que,hoteis,ha,no,porto,com,5,estrelas]),
+  verifica_sintaxe([quantos,hoteis,ha,no,porto,com,5,estrelas]),
+  verifica_sintaxe([quais,sao,os,hoteis,do,porto,com,5,estrelas]),
+  verifica_sintaxe([quais,os,hoteis,com,rating,inferior,a,8]),
+  verifica_sintaxe([quais,os,hoteis,que,possuem,rating,inferior,a,8]),
+  verifica_sintaxe([quais,os,hoteis,que,tem,rating,inferior,a,8]),
+  verifica_sintaxe([quais,sao,os,hoteis,que,ficam,no,porto]),
+  verifica_sintaxe([qual,e,o,rating,do,eurostars,oasis,plaza]),
+  verifica_sintaxe([quais,sao,os,hoteis,de,categoria,superior,a,3,estrelas,em,lisboa]),
+  \+verifica_sintaxe([quais,sao,as,hoteis,de,categoria,superior,a,3,estrelas,em,lisboa]),
+  verifica_sintaxe([que,servicos,disponibiliza,o,hotel,eurostars,porto,douro]),
+  \+verifica_sintaxe([que,servicos,disponibilizam,o,hotel,eurostars,porto,douro]),
+  verifica_sintaxe([quais,servicos,disponibiliza,o,eurostars,porto,douro]),
+  verifica_sintaxe([quais,os,hoteis,de,faro,que,possuem,categoria,inferior,a,4,e,tem,quartos,com,vista,de,mar]),
+  verifica_sintaxe([quantos,hoteis,tem,wifi,e,babysitting,e,piscina]),
+  verifica_sintaxe([quais,os,hoteis,com,rating,inferior,a,8]),
+  \+verifica_sintaxe([qual,os,hoteis,com,rating,inferior,a,8]),
+  verifica_sintaxe([quantos,sao,os,hoteis,do,porto]),
+  verifica_sintaxe([que,rating,tem,o,eurostars,oasis,plaza]).
+
+
+t_nova_gramat_d :-
+  verifica_sintaxe([o,hotel,eurostars,porto,douro,com,4,estrelas,fica,em,faro]),
+  verifica_sintaxe([o,hotel,eurostars,porto,douro,com,categoria,superior,a,3,estrelas,fica,em,faro]),
+  verifica_sintaxe([o,hotel,eurostars,porto,douro,com,categoria,superior,a,3,fica,em,faro]),
+  verifica_sintaxe([o,hotel,eurostars,porto,douro,com,rating,superior,a,3,fica,em,faro]),
+  verifica_sintaxe([o,hotel,the,lince,azores,great,hotel,e,em,ponta,delgada]),
+  verifica_sintaxe([o,hotel,the,lince,azores,great,hotel,tem,wifi,e,piscina,e,e,na,figueira,da,foz,e,tem,estacionamento]),
+  verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,4,estrelas]),
+  verifica_sintaxe([o,hotel,the,lince,azores,great,hotel,tem,wifi,e,piscina,e,e,na,figueira,da,foz]),
+  \+verifica_sintaxe([a,hotel,eurostars,porto,douro,fica,em,faro,e,possui,4,estrelas]),
+  \+verifica_sintaxe([o,hotel,eurostars,porto,douro,fica,em,faro,e,possui,1,estrelas]),
+  verifica_sintaxe([o,yellow,praia,monte,gordo,tem,wifi,e,fica,em,monte,gordo]).
+
+testes_conjuntivas :-
+  verifica_sintaxe([quantos,sao,os,hoteis,do,porto]),
+  verifica_sintaxe([e,com,wifi]),
+  verifica_sintaxe([e,em,coimbra]),
+  verifica_sintaxe([e,em,coimbra,com,wifi]),
+  verifica_sintaxe([e,com,mais,de,3,estrelas]),
+  verifica_sintaxe([quantas,estrelas,tem,o,eurostars,oasis,plaza]),
+  verifica_sintaxe([e,o,turim]),
+  verifica_sintaxe([e,quanto,rating]),
+  verifica_sintaxe([e,quantos,servicos,tem]),
+  verifica_sintaxe([e,quais,servicos]).
+  
+if_then_else(Condition, Action1, _) :- Condition, !, Action1.  
+if_then_else(_, _, Action2) :- Action2.
+
+if_then(Condition, Action1) :- if_then_else(Condition,Action1,true).  
+
+nothing(A,[]):-A=[].

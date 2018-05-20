@@ -3,7 +3,7 @@
 :-use_module(library(codesio)).
 :- use_module(library(random)).
 :- use_module(library(system)).
-:- consult('../novaGramatica.pl').
+:- consult('../gramatica.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%                                        Server                                                   %%%%
