@@ -12,7 +12,7 @@ Voice input using the [Web Speech API](https://developers.google.com/web/updates
 
 Response is read using [SpeechSynthesisUtterance](https://developer.mozilla.org/pt-BR/docs/Web/API/SpeechSynthesisUtterance) by Mozilla
 
-How to Run:
+## How to Run:
 * Open index.html with a live server
 * Consult frontend/server.pl with [SICStus Prolog](https://sicstus.sics.se/)
 * Run `server.` in the SICStus console
